@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <title th:text="${video.title}">동영상 상세</title>
+    <style>
+        /* 자막 텍스트 스타일 커스터마이징 */
+        .vjs-text-track {
+            font-size: 18px;                  /* 더 큰 글꼴 크기 */
+            color: #f8f8f8;                   /* 밝은 색의 텍스트 */
+            background-color: rgba(0, 0, 0, 0.8);  /* 어두운 배경과 약간의 투명도 */
+            padding: 6px 10px;                 /* 더 많은 여백 */
+            border-radius: 6px;               /* 자막에 둥근 테두리 추가 */
+        }
+
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .video-info {
+            max-width: 800px;
+            text-align: left;
+        }
+
+        .video-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .video-meta, .video-description {
+            margin-bottom: 10px;
+        }
+    </style>
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet">
+    <!-- Video.js JS -->
+    <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
+    <script>
+        // Video.js 초기화
+        var player = videojs('my-video', {
+            controls: true,
+            autoplay: false,
+            preload: 'auto',
+            playbackRates: [0.5, 1, 1.5, 2],
+            fluid: true
+        });
+
+        player.on('ended', function() {
+            alert('동영상이 종료되었습니다.');
+        });
+    </script>
+    <script>
+        var player = videojs('my-video', {
+            controls: true,
+            autoplay: false,
+            preload: 'auto',
+            playbackRates: [0.5, 1, 1.5, 2],
+            fluid: true
+        });
+
+        // 자막 기본 설정
+        player.ready(function() {
+            var tracks = player.textTracks(); // 자막 트랙 가져오기
+            for (var i = 0; i < tracks.length; i++) {
+                if (tracks[i].language === 'ko') {
+                    tracks[i].mode = 'showing'; // 자막 표시
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+<div layout:fragment="content" class="video-container">
+    <!-- 동영상 플레이어 -->
+    <div class="video-container">
+        <!-- Video.js 플레이어 -->
+        <video
+                id="my-video"
+                class="video-js vjs-default-skin"
+                controls
+                preload="auto"
+                width="800"
+                height="450"
+                data-setup="{}"
+        >
+            <!-- 동영상 소스 -->
+            <source th:src="@{/videoUploads/{encodeUrl}(encodeUrl=${encodeUrl})}" type="video/mp4">
+
+            <!-- 자막 (한국어) -->
+            <track th:src="@{/videoUploads/{subtitlePath}(subtitlePath=${subtitlePath})}" kind="subtitles" srclang="ko" label="한국어" default />
+        </video>
+    </div>
+
+    <!-- 동영상 정보 -->
+    <div class="video-info">
+        <div class="video-title" th:text="${video.title}"></div>
+        <div class="video-meta">
+            장르: <span th:text="${video.genre}"></span><br>
+            출시일: <span th:text="${video.release_date}"></span><br>
+            연령 등급: <span th:text="${video.age_rating}"></span><br>
+            언어: <span th:text="${video.language}"></span>
+        </div>
+        <div class="video-description" th:text="${video.description}"></div>
+    </div>
+</div>
+</body>
+</html>

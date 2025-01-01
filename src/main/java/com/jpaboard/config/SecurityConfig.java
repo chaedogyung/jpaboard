@@ -1,40 +1,45 @@
 package com.jpaboard.config;
 
 import com.jpaboard.service.MemberService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-//    private final MemberService memberService;
-//
-//    public SecurityConfig(MemberService memberService) {
-//        this.memberService = memberService;
-//    }
+    @Autowired
+    MemberService memberService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.formLogin()
-                .loginPage("/members/login")
-                .defaultSuccessUrl("/")
-                .usernameParameter("useremail")
-                .failureUrl("/members/login/error")
-                .and()
-                .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout"))
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
+        return http.authorizeHttpRequests(authorizeHttpRequestsCustomizer -> authorizeHttpRequestsCustomizer
+                        .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/", "/members/**", "/video/**", "/images/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest()
+                        .authenticated()
+                ).formLogin(formLoginCustomizer -> formLoginCustomizer
+                        .loginPage("/members/login")
+                        .defaultSuccessUrl("/")
+                        .usernameParameter("useremail")
+                        .failureHandler(new CustomAuthenticationFailureHandler())
+                ).logout(logoutCustomizer -> logoutCustomizer
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout"))
+                        .logoutSuccessUrl("/")
 
-        return http.build();
+                )
+                .build()
+                ;
     }
 
     @Bean

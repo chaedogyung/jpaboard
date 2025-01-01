@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+  <title>동영상 리스트</title>
+  <style>
+    /* Grid Container */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+
+    /* Video Card */
+    .video-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-thumbnail img {
+      width: 100%;
+      height: auto;
+    }
+
+    .video-info {
+      padding: 10px;
+    }
+
+    .video-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 8px;
+      color: #333;
+    }
+
+    .video-meta {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .video-description {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.4em;
+    }
+  </style>
+</head>
+<body>
+<div layout:fragment="content">
+  <h1>등록된 동영상</h1>
+  <div class="video-grid">
+    <!-- Each Video Card -->
+    <div class="video-card" th:each="video : ${videos}">
+      <!-- Video Thumbnail -->
+      <div class="video-thumbnail">
+        <a th:href="@{/video/{video_id}(video_id=${video.video_id})}">
+          <img th:src="@{/images/{thumbnail_url}(thumbnail_url=${video.thumbnail_url})}" alt="썸네일">
+        </a>
+      </div>
+      <!-- Video Information -->
+      <div class="video-info">
+        <!-- Title -->
+        <div class="video-title" th:text="${video.title}"></div>
+        <!-- Meta Information -->
+        <div class="video-meta">
+          장르: <span th:text="${video.genre}"></span><br>
+          출시일: <span th:text="${video.release_date}"></span>
+        </div>
+        <!-- Description -->
+        <div class="video-description" th:text="${video.description}"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
