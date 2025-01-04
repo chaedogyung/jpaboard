@@ -14,7 +14,7 @@
 <body>
 <div layout:fragment="content">
     <h1>동영상 등록</h1>
-    <form method="post" th:action="@{/admin/video/new}" enctype="multipart/form-data">
+    <form method="post" th:action="@{/user/video/new}" enctype="multipart/form-data">
         <!-- 동영상 파일 -->
         <label th:for="videoFile">동영상 파일:</label>
         <input class="form-control restrict-width" type="file" id="videoFile" name="videoFile" required>
@@ -22,12 +22,12 @@
 
         <!-- 자막 파일 -->
         <label th:for="subtitles">자막 파일:</label>
-        <input class="form-control restrict-width" type="file" id="subtitles" name="subtitles" required>
+        <input class="form-control restrict-width" type="file" id="subtitles" name="subtitles">
         <br>
 
         <!-- 썸네일 이미지 파일 -->
         <label th:for="thumbnailFile">썸네일 이미지 파일:</label>
-        <input class="form-control restrict-width" type="file" id="thumbnailFile" name="thumbnailFile" required>
+        <input class="form-control restrict-width" type="file" id="thumbnailFile" name="thumbnailFile">
         <br>
 
         <!-- 제목 -->

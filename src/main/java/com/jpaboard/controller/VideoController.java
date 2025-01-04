@@ -10,14 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.util.Date;
 
 @Controller
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/user")
 @RequiredArgsConstructor
 public class VideoController {
 
@@ -66,7 +65,36 @@ public class VideoController {
         }
 
         // 업로드 결과 페이지로 이동
-        return "redirect:/video/list";
+        return "video/list";
+    }
+
+    //동영상 목록
+    @GetMapping("/video/list")
+    public ModelAndView getVideoList(/*Model model*/) {
+        ModelAndView mv = new ModelAndView("video/videoList");
+        mv.addObject("videos", videoService.getAllVideos());
+        return mv; // 반환할 뷰의 이름
+    }
+
+    // 동영상 상세 페이지
+    @GetMapping("/video/{video_id}")
+    public ModelAndView getVideoDetail(@PathVariable Long video_id) throws UnsupportedEncodingException {
+        // 동영상 ID로 정보를 조회
+        Videos video = videoService.getVideoById(video_id);
+        String filePath = video.getVideo_url();
+        int lastIndexOfBackslash = filePath.lastIndexOf("\\");
+        String fileName = filePath.substring(lastIndexOfBackslash + 1);
+        System.out.println(fileName);
+
+        String subtitlePath = video.getSubtitle_file_path();
+
+        // 조회된 비디오 정보를 뷰에 전달
+        ModelAndView mv = new ModelAndView("video/videoDetail");
+
+        mv.addObject("video", video);
+        mv.addObject("encodeUrl", fileName);
+        mv.addObject("subtitlePath", subtitlePath);
+        return mv; // 반환할 뷰의 이름
     }
 
 }

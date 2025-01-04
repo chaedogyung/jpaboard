@@ -2,32 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<div th:fragment="header">
+<div th:fragment="header" class="header">
     <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
         <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03"
                 aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="/">Shop</a>
+        <a class="navbar-brand" href="/">OTT Project</a>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/video/newReg">동영상 등록</a>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                    <a class="nav-link" href="/user/video/newReg">동영상 등록</a>
                 </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/videos">동영상 관리</a>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                    <a class="nav-link" href="/user/videos">동영상 관리</a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/video/list">동영상 목록</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" href="/cart">장바구니</a>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                    <a class="nav-link" href="/user/video/list">동영상 목록</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" href="/orders">구매이력</a>
+                    <a class="nav-link" href="/board/boardList">게시판</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/board/writeView">글쓰기</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link" href="/members/login">로그인</a>

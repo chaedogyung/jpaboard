@@ -50,7 +50,7 @@
         // Video.js 초기화
         var player = videojs('my-video', {
             controls: true,
-            autoplay: false,
+            autoplay: true,
             preload: 'auto',
             playbackRates: [0.5, 1, 1.5, 2],
             fluid: true
@@ -58,15 +58,6 @@
 
         player.on('ended', function() {
             alert('동영상이 종료되었습니다.');
-        });
-    </script>
-    <script>
-        var player = videojs('my-video', {
-            controls: true,
-            autoplay: false,
-            preload: 'auto',
-            playbackRates: [0.5, 1, 1.5, 2],
-            fluid: true
         });
 
         // 자막 기본 설정
@@ -76,6 +67,17 @@
                 if (tracks[i].language === 'ko') {
                     tracks[i].mode = 'showing'; // 자막 표시
                 }
+            }
+        });
+
+        // 화살표 키로 동영상 이동
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowRight') {
+                // 오른쪽 화살표: 5초 앞으로
+                player.currentTime(player.currentTime() + 5);
+            } else if (event.key === 'ArrowLeft') {
+                // 왼쪽 화살표: 5초 뒤로
+                player.currentTime(player.currentTime() - 5);
             }
         });
     </script>
