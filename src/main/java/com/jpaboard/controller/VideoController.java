@@ -65,7 +65,7 @@ public class VideoController {
         }
 
         // 업로드 결과 페이지로 이동
-        return "video/list";
+        return "redirect:/";
     }
 
     //동영상 목록
@@ -97,4 +97,10 @@ public class VideoController {
         return mv; // 반환할 뷰의 이름
     }
 
+    //동영상 목록
+    @GetMapping("/video/manage")
+    public String getVideoManageList(Model model) {
+        model.addAttribute("videos", videoService.getAllVideos());
+        return "video/videoManageList"; // 반환할 뷰의 이름
+    }
 }

@@ -23,23 +23,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authorizeHttpRequestsCustomizer -> authorizeHttpRequestsCustomizer
-                        .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
-                        .requestMatchers("/", "/members/**", "/video/**", "/images/**").permitAll()
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/css/**", "/js/**", "/img/**").permitAll() // 공용 리소스
+                        .requestMatchers("/", "/members/**", "/video/**", "/images/**").permitAll() // 공용 페이지
+                        .requestMatchers("/user/video/manage", "/user/video/newReg","/user/video/new").hasRole("ADMIN") // ADMIN만 접근 가능
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") // USER와 ADMIN 모두 접근 가능
                         .anyRequest()
-                        .authenticated()
-                ).formLogin(formLoginCustomizer -> formLoginCustomizer
-                        .loginPage("/members/login")
-                        .defaultSuccessUrl("/")
-                        .usernameParameter("useremail")
-                        .failureHandler(new CustomAuthenticationFailureHandler())
-                ).logout(logoutCustomizer -> logoutCustomizer
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout"))
-                        .logoutSuccessUrl("/")
-
+                        .authenticated() // 나머지 경로는 인증 필요
                 )
-                .build()
-                ;
+                .formLogin(formLoginCustomizer -> formLoginCustomizer
+                        .loginPage("/members/login") // 사용자 지정 로그인 페이지
+                        .defaultSuccessUrl("/") // 로그인 성공 후 리다이렉트
+                        .usernameParameter("useremail") // 사용자 이메일 파라미터
+                        .failureHandler(new CustomAuthenticationFailureHandler()) // 로그인 실패 핸들러
+                )
+                .logout(logoutCustomizer -> logoutCustomizer
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout")) // 사용자 지정 로그아웃
+                        .logoutSuccessUrl("/") // 로그아웃 후 리다이렉트
+                )
+                .build();
     }
 
     @Bean

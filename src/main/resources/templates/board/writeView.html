@@ -19,6 +19,8 @@
 <body>
 
 <div layout:fragment="content" id="root">
+    <h4>게시판 글쓰기</h4>
+    <hr>
     <form name="writeForm" method="post" th:action="@{/board/writeReg}" enctype="multipart/form-data">
         <div class="form-group">
             <label th:for="title" class="col-sm-2 control-label">제목</label>

@@ -3,9 +3,62 @@
       layout:decorate="~{layouts/layout1}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>게시판</title>
 </head>
+<style>
+    #paging {
+        list-style: none;
+        float: left;
+        padding: 6px;
+    }
+</style>
 <body>
+<div layout:fragment="content" id="root">
+    <h4>게시판</h4>
+    <br>
+    <form method="get" role="form">
+        <table class="table table-hover">
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>등록일</th>
+                <th>조회수</th>
+            </tr>
+            <tr th:each="item : ${list}">
+                <td th:text="${item.bno}"></td>
+                <td th:text="${item.title}"></td>
+                <td th:text="${item.writer}"></td>
+                <td th:text="${item.regDate}"></td>
+                <td th:text="${item.hit}"></td>
+            </tr>
+        </table>
+    </form>
 
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Button -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/board/boardList(page=${currentPage - 1})}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/board/boardList(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+
+            <!-- Next Button -->
+            <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/board/boardList(page=${currentPage + 1})}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
 </body>
 </html>

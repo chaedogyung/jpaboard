@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.jpaboard</groupId>
-    <artifactId>jpaboard</artifactId>
+    <artifactId>OTT-JPA-Project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>jpaboard</name>
     <description>jpaboard</description>

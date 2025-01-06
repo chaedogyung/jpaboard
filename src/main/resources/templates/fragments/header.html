@@ -13,13 +13,13 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
                     <a class="nav-link" href="/user/video/newReg">동영상 등록</a>
                 </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
-                    <a class="nav-link" href="/user/videos">동영상 관리</a>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                    <a class="nav-link" href="/user/video/manage">동영상 관리</a>
                 </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER','ROLE_ADMIN')">
                     <a class="nav-link" href="/user/video/list">동영상 목록</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">

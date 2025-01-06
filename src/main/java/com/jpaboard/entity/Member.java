@@ -54,7 +54,7 @@ public class Member {
         member.setUsername(memberFormDto.getUsername());
         member.setUseremail(memberFormDto.getUseremail());
         member.setUseraddress(memberFormDto.getUseraddress());
-        member.setRole(Role.USER);
+        member.setRole(Role.ADMIN);
         return member;
     }
 }
