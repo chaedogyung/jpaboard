@@ -22,6 +22,16 @@
                 <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER','ROLE_ADMIN')">
                     <a class="nav-link" href="/user/video/list">동영상 목록</a>
                 </li>
+
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_SECRET')">
+                    <a class="nav-link" href="/secret/video/newReg">시크릿 동영상 등록</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_SECRET')">
+                    <a class="nav-link" href="/secret/video/manage">시크릿 동영상 관리</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_SECRET')">
+                    <a class="nav-link" href="/secret/video/list">시크릿 동영상 목록</a>
+                </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
                     <a class="nav-link" href="/board/boardList">게시판</a>
                 </li>

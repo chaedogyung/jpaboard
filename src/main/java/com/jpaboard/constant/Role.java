@@ -1,5 +1,5 @@
 package com.jpaboard.constant;
 
 public enum Role {
-    GUEST, USER, ADMIN;
+    SECRET, USER, ADMIN;
 }

@@ -26,6 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/img/**").permitAll() // 공용 리소스
                         .requestMatchers("/", "/members/**", "/video/**", "/images/**").permitAll() // 공용 페이지
                         .requestMatchers("/user/video/manage", "/user/video/newReg","/user/video/new").hasRole("ADMIN") // ADMIN만 접근 가능
+                        .requestMatchers("/secret/video/manage*", "/secret/video/newReg","/secret/video/new").hasRole("SECRET") // SECRET 접근 가능
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") // USER와 ADMIN 모두 접근 가능
                         .anyRequest()
                         .authenticated() // 나머지 경로는 인증 필요

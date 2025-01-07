@@ -1,7 +1,7 @@
 package com.jpaboard.controller;
 
-import com.jpaboard.entity.Videos;
-import com.jpaboard.service.VideoService;
+import com.jpaboard.entity.Secret_videos;
+import com.jpaboard.service.SecretVideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.io.IOException;
 import java.util.Date;
 
 @Controller
-@RequestMapping(value = "/user")
+@RequestMapping("/secret/*")
 @RequiredArgsConstructor
-public class VideoController {
+public class SecretController {
 
-    private final VideoService videoService;
+    private final SecretVideoService secretVideoService;
 
     private static final long MAX_VIDEO_SIZE = 5_500L * 1024 * 1024; // 동영상 최대 5.5GB
     private static final long MAX_OTHER_FILE_SIZE = 20L * 1024 * 1024; // 썸네일/자막 최대 20MB
@@ -28,7 +28,7 @@ public class VideoController {
 
     @GetMapping(value = "/video/newReg")
     public String videoForm() {
-        return "video/videoForm";
+        return "secret/secretVideoForm";
     }
 
     @PostMapping(value = "/video/new")
@@ -57,7 +57,6 @@ public class VideoController {
             return "video/videoForm";
         }
 
-
         // 동영상 파일 크기 및 확장자 검증
         String videoString = validateVideoFile(videoFile);
         if (!videoString.equals("")) {
@@ -72,11 +71,11 @@ public class VideoController {
             return "video/videoForm";
         }
 
-        // VideoService를 통해 비디오 저장
-        Videos video = videoService.saveVideo(videoFile, subtitle, thumbnailFile, title, description, genre, releaseDate, duration, language, age_rating);
+        // secretVideoService를 통해 비디오 저장
+        Secret_videos secret_videos = secretVideoService.saveVideo(videoFile, subtitle, thumbnailFile, title, description, genre, releaseDate, duration, language, age_rating);
 
         // 성공 메시지와 저장된 비디오 정보를 모델에 추가
-        model.addAttribute("video", video);
+        model.addAttribute("video", secret_videos);
 
         // 업로드 결과 페이지로 이동
         return "redirect:/";
@@ -140,8 +139,8 @@ public class VideoController {
     //동영상 목록
     @GetMapping("/video/list")
     public ModelAndView getVideoList(/*Model model*/) {
-        ModelAndView mv = new ModelAndView("video/videoList");
-        mv.addObject("videos", videoService.getAllVideos());
+        ModelAndView mv = new ModelAndView("secret/secretVideoList");
+        mv.addObject("videos", secretVideoService.getAllVideos());
         return mv; // 반환할 뷰의 이름
     }
 
@@ -149,7 +148,7 @@ public class VideoController {
     @GetMapping("/video/{video_id}")
     public ModelAndView getVideoDetail(@PathVariable Long video_id) throws UnsupportedEncodingException {
         // 동영상 ID로 정보를 조회
-        Videos video = videoService.getVideoById(video_id);
+        Secret_videos video = secretVideoService.getVideoById(video_id);
         String filePath = video.getVideo_url();
         int lastIndexOfBackslash = filePath.lastIndexOf("\\");
         String fileName = filePath.substring(lastIndexOfBackslash + 1);
@@ -158,7 +157,7 @@ public class VideoController {
         String subtitlePath = video.getSubtitle_file_path();
 
         // 조회된 비디오 정보를 뷰에 전달
-        ModelAndView mv = new ModelAndView("video/videoDetail");
+        ModelAndView mv = new ModelAndView("secret/secretVideoDetail");
 
         mv.addObject("video", video);
         mv.addObject("encodeUrl", fileName);
@@ -169,26 +168,7 @@ public class VideoController {
     //동영상 목록
     @GetMapping("/video/manage")
     public String getVideoManageList(Model model) {
-        model.addAttribute("videos", videoService.getAllVideos());
-        return "video/videoManageList"; // 반환할 뷰의 이름
-    }
-
-
-    //좋아요 동영상 목록
-    @GetMapping("/video/favoriteVideo")
-    public String getfavoriteVideoList(Model model) {
-        return "video/videoFavorite"; // 반환할 뷰의 이름
-    }
-
-    //동영상 시청이력
-    @GetMapping("/video/history")
-    public String getVideoHistory(Model model) {
-        return "video/videoHistory"; // 반환할 뷰의 이름
-    }
-
-    //동영상 시청이력
-    @GetMapping("/customer/center")
-    public String getVideoContact(Model model) {
-        return "video/inquryVideo"; // 반환할 뷰의 이름
+        model.addAttribute("videos", secretVideoService.getAllVideos());
+        return "secret/secretVideoManageList"; // 반환할 뷰의 이름
     }
 }
