@@ -3,6 +3,7 @@ package com.jpaboard.controller;
 import com.jpaboard.entity.Videos;
 import com.jpaboard.service.VideoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class VideoController {
 
     private final VideoService videoService;
 
-    private static final long MAX_VIDEO_SIZE = 5_500L * 1024 * 1024; // 동영상 최대 5.5GB
+    private static final long MAX_VIDEO_SIZE = 7_500L * 1024 * 1024; // 동영상 최대 7.5GB
     private static final long MAX_OTHER_FILE_SIZE = 20L * 1024 * 1024; // 썸네일/자막 최대 20MB
 
 
@@ -52,7 +53,7 @@ public class VideoController {
 
         // 자막 파일 크기 및 확장자 검증
         String sub = validateSubtitleFile(subtitle);
-        if (!sub.equals("")) {
+        if (!sub.isEmpty()) {
             model.addAttribute("error", sub);
             return "video/videoForm";
         }
@@ -103,7 +104,7 @@ public class VideoController {
     private String validateVideoFile(MultipartFile videoFile) {
         String returnString = "";
         if (videoFile.getSize() > MAX_VIDEO_SIZE) {
-            returnString = "동영상 파일 크기는 최대 5.5GB까지만 허용됩니다.";
+            returnString = "동영상 파일 크기는 최대 7.5GB까지만 허용됩니다.";
         }
         String extension = getFileExtension(videoFile.getOriginalFilename());
         if (!extension.matches("mp4|mkv|avi|mov|wmv")) {
@@ -166,10 +167,10 @@ public class VideoController {
         return mv; // 반환할 뷰의 이름
     }
 
-    //동영상 목록
+    //동영상 관리 목록
     @GetMapping("/video/manage")
     public String getVideoManageList(Model model) {
-        model.addAttribute("videos", videoService.getAllVideos());
+        model.addAttribute("videos", videoService.getAllVideos()); // "id" 기준 내림차순 정렬));
         return "video/videoManageList"; // 반환할 뷰의 이름
     }
 
@@ -186,7 +187,7 @@ public class VideoController {
         return "video/videoHistory"; // 반환할 뷰의 이름
     }
 
-    //동영상 시청이력
+    //고객센터
     @GetMapping("/customer/center")
     public String getVideoContact(Model model) {
         return "video/inquryVideo"; // 반환할 뷰의 이름

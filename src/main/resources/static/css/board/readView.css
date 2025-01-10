@@ -1,0 +1,103 @@
+.no-content-message {
+    color: #777; /* Gray color for the message */
+    font-size: 1.2em; /* Slightly larger font */
+    text-align: center; /* Center the message */
+    margin-top: 20px; /* Space above the message */
+    padding: 10px; /* Padding around the message */
+    border: 1px dashed #ccc; /* Dashed border for emphasis */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+}
+/* 댓글 목록 컨테이너 스타일 */
+.reply-section {
+    margin: 20px 0;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.replyList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reply-item {
+    margin-bottom: 15px;
+}
+
+/* 댓글 카드 스타일 */
+.reply-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.reply-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+}
+
+/* 댓글 헤더 스타일 */
+.reply-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.reply-writer {
+    font-weight: bold;
+}
+
+.reply-date {
+    font-size: 12px;
+    color: #888;
+}
+
+/* 댓글 본문 스타일 */
+.reply-body {
+    margin-bottom: 15px;
+}
+
+.reply-text {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.4;
+}
+
+/* 댓글 푸터 (버튼) 스타일 */
+.reply-footer {
+    display: flex;
+    gap: 10px;
+}
+
+.reply-footer .btn {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.reply-footer .btn-warning {
+    background-color: #f0ad4e;
+    color: #fff;
+    border: none;
+}
+
+.reply-footer .btn-warning:hover {
+    background-color: #ec971f;
+}
+
+.reply-footer .btn-danger {
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+}
+
+.reply-footer .btn-danger:hover {
+    background-color: #c9302c;
+}

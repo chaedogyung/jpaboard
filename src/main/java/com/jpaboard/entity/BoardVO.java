@@ -2,24 +2,21 @@ package com.jpaboard.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "mp_board")
+@Table(name = "MP_BOARD", schema = "STUDY") // 스키마 통일
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @SequenceGenerator(
-        name = "mp_board_seq_generator", // Hibernate가 사용하는 시퀀스 제너레이터 이름
-        sequenceName = "mp_board_seq",  // 실제 데이터베이스 시퀀스 이름
-        allocationSize = 1             // Hibernate와 DB 시퀀스의 증가 값 일치
+        name = "mp_board_seq_generator",
+        sequenceName = "mp_board_seq",
+        allocationSize = 1
 )
 public class BoardVO {
 
@@ -38,7 +35,7 @@ public class BoardVO {
     private String writer;
 
     @Column(name = "REGDATE", updatable = false)
-    private LocalDateTime regDate = LocalDateTime.now();
+    private LocalDateTime regDate;
 
     @Column(name = "HIT", nullable = false)
     private Long hit = 0L;
@@ -46,4 +43,10 @@ public class BoardVO {
     @OneToMany(mappedBy = "boardVO", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<MpReply> replies = new ArrayList<>();
+
+    // 엔티티 생성 시 기본값 설정
+    @PrePersist
+    public void prePersist() {
+        this.regDate = this.regDate == null ? LocalDateTime.now() : this.regDate;
+    }
 }

@@ -2,6 +2,7 @@ package com.jpaboard.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.jpaboard.entity.Videos;

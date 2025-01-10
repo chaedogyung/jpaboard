@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판</title>
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/board/readView.css}">
+</head>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            startReplyList();
+            // 댓글 작성
+            $('.replyWriteBtn').on('click', function () {
+                var bno = $('#bno').val();
+                var reWriter = $('#reWriter').val();
+                var reContent = $('#reContent').val();
+                var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
+                $.ajax({
+                    url: '/board/replyWrite', // Ensure the URL starts from the root
+                    type: 'post',
+                    data: {
+                        bno,
+                        reWriter,
+                        reContent
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
+                    },
+                    success: function () {
+                        startReplyList();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred while fetching replies: ", error);
+                        // Optionally, show an error message
+                    }
+                });
+            })
+        })
+
+        //댓글 목록
+        function startReplyList() {
+            $.ajax({
+                url: '/board/replyList',
+                type: 'GET',
+                data: {bno: $('#bno').val()},
+                success: function (data) {
+                    if (data && data.length > 0) {
+                        // 댓글 목록이 있는 경우
+                        $('.replyList').empty(); // 기존 댓글 목록 초기화
+                        data.forEach(function (reply) {
+                            $('#noContentMessage').hide();
+                            $('.replyList').append(`
+                       <li class="reply-item" data-rno="${reply.reRno}">
+                            <div class="reply-card">
+                                <div class="reply-header">
+                                    <div class="reply-writer">작성자: <strong>${reply.reWriter}</strong></div>
+                                    <div class="reply-date">${new Date(reply.reRegDate).toLocaleDateString()}</div>
+                                </div>
+                                <div class="reply-body">
+                                    <p class="reply-text">${reply.reContent}</p>
+                                </div>
+                                <div class="reply-footer">
+                                    <button type="button" class="replyUpdateBtn btn btn-sm btn-warning">수정</button>
+                                    <button type="button" class="replyDeleteBtn btn btn-sm btn-danger" data-rno="${reply.reRno}">삭제</button>
+                                </div>
+                            </div>
+                        </li>
+                    `);
+                        });
+                    } else {
+                        // 댓글이 없는 경우
+                        $('.replyList').empty();
+                        $('#noContentMessage').show();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred while fetching replies: ", error);
+                    // Optionally, show an error message
+                }
+            });
+        }
+
+        // 댓글 수정
+        $(document).on('click', '.replyUpdateBtn', function () {
+            const $li = $(this).closest('li');
+            const replyContent = $li.find('.reply-text').text();
+            const replyRno = $li.data('rno');
+            //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
+            $li.find('.reply-text').replaceWith(`
+            <input type="text" class="replyEditInput" value="${replyContent}" />
+        `);
+            $li.find('.reply-footer').html(`
+            <button type="button" class="replySaveBtn btn btn-warning" data-rno="${replyRno}">저장</button>
+            <button type="button" class="replyCancelBtn btn btn-danger">취소</button>
+        `);
+        });
+
+        //수정 취소
+        $(document).on('click', '.replyCancelBtn', function () {
+            const $li = $(this).closest('li');
+            const replyContent = $li.find('.replyEditInput').val();
+            const replyRno = $li.data('rno');
+
+            //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
+            $li.find('.replyEditInput').replaceWith(`
+            <p class="reply-text">${replyContent}</p>
+        `);
+            $li.find('.reply-footer').html(`
+            <button type="button" class="replyUpdateBtn btn btn-warning">수정</button>
+            <button type="button" class="replyDeleteBtn btn btn-danger" data-rno="${replyRno}">삭제</button>
+        `);
+        });
+
+        // 댓글 수정 저장
+        $(document).on('click', '.replySaveBtn', function () {
+            const $li = $(this).closest('li');
+            const replyRno = $(this).data('rno');
+            const updatedContent = $li.find('.replyEditInput').val();
+            var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
+            $.ajax({
+                url: '/board/replyUpdate', // Your endpoint for updating
+                type: 'post',
+                data: {
+                    reRno: replyRno,
+                    reContent: updatedContent
+                },
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
+                },
+                success: function () {
+                    startReplyList(); // 댓글 목록을 다시 조회하여 업데이트
+                },
+                error: function (xhr, status, error) {
+                    console.error("댓글 수정 중 오류 발생: ", error);
+                    alert("댓글 수정에 실패했습니다.");
+                }
+            });
+        });
+
+        // 댓글 삭제
+        $(document).on('click', '.replyDeleteBtn', function () {
+            const $li = $(this).closest('li');
+            const replyRno = $li.data('rno');
+            var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
+            $.ajax({
+                url: '/board/replyDelete', // Your endpoint for updating
+                type: 'delete',
+                data: {
+                    reRno: replyRno
+                },
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
+                },
+                success: function () {
+                    startReplyList(); // 댓글 목록을 다시 조회하여 업데이트
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred while updating reply: ", error);
+                    // Optionally, show an error message
+                }
+            });
+        });
+
+        // 목록
+        $(document).on('click', '.list_btn', function () {
+            // $(".list_btn").on("click", function () {
+            location.href = "/board/boardList";
+            // });
+        });
+    </script>
+</th:block>
+<body>
+<div layout:fragment="content" id="root">
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+    <header>
+        <h1>게시판</h1>
+    </header>
+    <div class="form-group">
+        <label for="title" class="col-sm-2 control-label">제목</label>
+        <input type="text" id="title" name="title" th:value="${read.title}" class="form-control" readonly>
+        <input type="hidden" id="bno" name="bno" th:value="${read.bno}">
+    </div>
+    <div class="form-group">
+        <label for="content" class="col-sm-2 control-label">내용</label>
+        <textarea id="content" name="content" th:text="${read.content}" class="chk form-control" style="height: 300px;"
+                  readonly></textarea>
+    </div>
+    <div class="form-group">
+        <label for="writer" class="col-sm-2 control-label">작성자</label>
+        <input type="text" id="writer" name="writer" th:value="${read.writer}" class="form-control"
+               readonly="readonly"/>
+    </div>
+    <div class="form-group">
+        <label for="regDate" class="col-sm-2 control-label">작성날짜</label>
+        <span th:text="${regdate}"></span>
+    </div>
+    <div>
+        <button type="submit" class="update_btn btn btn-warning">수정</button>
+        <button type="submit" class="delete_btn btn btn-danger">삭제</button>
+        <button type="submit" class="list_btn btn btn-primary">목록</button>
+    </div>
+
+    <div id="reply" class="reply-section">
+        <ol class="replyList">
+            <!-- Message for no content -->
+        </ol>
+        <p id="noContentMessage" style="display: none;" class="no-content-message">댓글이 없습니다.</p>
+    </div>
+
+    <form class="form-horizontal">
+        <div id="replyWrite">
+
+            <div class="form-group">
+                <label for="writer" class="col-sm-2 control-label">댓글 작성자</label>
+                <div class="col-sm-10">
+                    <input type="text" id="reWriter" name="reWriter" class="form-control"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="content" class="col-sm-2 control-label">댓글 내용</label>
+                <div class="col-sm-10">
+                    <input type="text" id="reContent" name="reContent" class="form-control"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="button" class="replyWriteBtn btn btn-warning">작성</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

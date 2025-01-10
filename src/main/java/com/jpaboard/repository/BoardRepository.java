@@ -11,6 +11,7 @@ import java.util.List;
 public interface BoardRepository extends JpaRepository<BoardVO, Long>, QuerydslPredicateExecutor<BoardVO> {
 
     List<BoardVO> findByTitle(String title);
+    BoardVO findByBno(Long bno);
 
     List<BoardVO> findByTitleOrContent(String title, String content);
 

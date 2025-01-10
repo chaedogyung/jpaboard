@@ -1,0 +1,107 @@
+/* 자막 텍스트 스타일 커스터마이징 */
+.vjs-text-track {
+    font-size: 18px;
+    color: #f8f8f8;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.video-thumbnail {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 20px;
+}
+
+.video-info {
+    max-width: 800px;
+    text-align: left;
+}
+
+.video-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.video-meta, .video-description {
+    margin-bottom: 10px;
+}
+
+.video-actions {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.video-actions img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.video-actions span {
+    margin-right: 20px;
+    font-size: 16px;
+}
+
+.video-stats {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.video-stats img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.video-stats span {
+    font-size: 16px;
+}
+
+/* 자막 텍스트 스타일 커스터마이징 */
+.vjs-text-track {
+    font-size: 18px; /* 더 큰 글꼴 크기 */
+    color: #f8f8f8; /* 밝은 색의 텍스트 */
+    background-color: rgba(0, 0, 0, 0.8); /* 어두운 배경과 약간의 투명도 */
+    padding: 6px 10px; /* 더 많은 여백 */
+    border-radius: 6px; /* 자막에 둥근 테두리 추가 */
+}
+
+.video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.video-thumbnail {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 20px;
+}
+
+.video-info {
+    max-width: 800px;
+    text-align: left;
+}
+
+.video-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.video-meta, .video-description {
+    margin-bottom: 10px;
+}

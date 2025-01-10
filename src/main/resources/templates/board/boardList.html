@@ -5,13 +5,6 @@
     <meta charset="UTF-8">
     <title>게시판</title>
 </head>
-<style>
-    #paging {
-        list-style: none;
-        float: left;
-        padding: 6px;
-    }
-</style>
 <body>
 <div layout:fragment="content" id="root">
     <h4>게시판</h4>
@@ -25,9 +18,14 @@
                 <th>등록일</th>
                 <th>조회수</th>
             </tr>
+
             <tr th:each="item : ${list}">
                 <td th:text="${item.bno}"></td>
-                <td th:text="${item.title}"></td>
+                <td>
+                    <a th:href="@{readView(bno=${item.bno})}">
+                        <span th:text="${item.title}"></span>
+                    </a>
+                </td>
                 <td th:text="${item.writer}"></td>
                 <td th:text="${item.regDate}"></td>
                 <td th:text="${item.hit}"></td>
