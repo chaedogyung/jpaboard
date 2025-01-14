@@ -2,18 +2,28 @@ package com.jpaboard.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "MP_FILE", schema = "STUDY")
+@ToString
+@AllArgsConstructor
+@SequenceGenerator(
+        name = "mp_file_seq_generator",
+        sequenceName = "SEQ_MP_FILE_NO",
+        allocationSize = 1
+)
 public class BoardFile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "mp_file_seq_generator")
     @Column(name = "FILE_NO")
     private Long fileNo; // 파일 번호
 

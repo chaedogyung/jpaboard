@@ -1,9 +1,12 @@
 package com.jpaboard.controller;
 
+import com.jpaboard.entity.BoardFile;
 import com.jpaboard.entity.BoardVO;
 import com.jpaboard.entity.MpReply;
+import com.jpaboard.service.BoardFileService;
 import com.jpaboard.service.BoardService;
 import com.jpaboard.service.ReplyService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -19,7 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.List;
 
 @Controller
@@ -30,6 +34,7 @@ public class BoardController {
     private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
     private final BoardService boardService;
     private final ReplyService replyService;
+    private final BoardFileService boardFileService;
 
     //테스트 상세 뷰
     @GetMapping(value = "/testView")
@@ -63,6 +68,14 @@ public class BoardController {
         return "redirect:/board/boardList";
     }
 
+    //게시판 수정 뷰
+    @GetMapping(value = "/boardUpdate")
+    public String updateView(Model model, @RequestParam("bno") Long bno) {
+        logger.info("updateView");
+        model.addAttribute("updateView", boardService.read(bno));
+        return "board/updateView";
+    }
+
     //게시판 목록 뷰
     @GetMapping(value = "/boardList")
     public String boardList(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
@@ -92,7 +105,12 @@ public class BoardController {
     @GetMapping(value = "/readView")
     public String readView(BoardVO boardVO, Model model) {
         logger.info("read");
+
+        List<BoardFile> attachedFiles = boardService.findFilesByBno(boardVO.getBno());
+
+        model.addAttribute("file", attachedFiles);
         model.addAttribute("read", boardService.read(boardVO.getBno()));
+
         return "board/readView";
     }
 
@@ -156,4 +174,42 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create reply.");
         }
     }
+
+    //첨부파일 다운로드
+    @GetMapping(value = "/fileDown")
+    public void fileDown(BoardFile boardFile, HttpServletResponse response) throws Exception {
+
+        //파일 서비스 호출
+        BoardFile boFile = boardFileService.getFile(boardFile.getFileNo());
+
+        //파일경로 가져오기
+        String filePath = boardService.filePath + "/" + boFile.getOrgFileName();
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new FileNotFoundException("파일이 존재하지 않습니다.");
+        }
+
+        String encodedFileName = URLEncoder.encode(file.getName(), "UTF-8").replaceAll("\\+", "%20");
+
+        //응답헤더설정
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+        response.setHeader("Content-Length", String.valueOf(file.length()));
+
+        //파일을 응답에 작성
+        try {
+            InputStream inputStream = new FileInputStream(file);
+            OutputStream outputStream = response.getOutputStream();
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
