@@ -22,7 +22,7 @@ public class SecretController {
 
     private final SecretVideoService secretVideoService;
 
-    private static final long MAX_VIDEO_SIZE = 5_500L * 1024 * 1024; // 동영상 최대 5.5GB
+    private static final long MAX_VIDEO_SIZE = 9_500L * 1024 * 1024; // 동영상 최대 5.5GB
     private static final long MAX_OTHER_FILE_SIZE = 20L * 1024 * 1024; // 썸네일/자막 최대 20MB
 
 
@@ -102,7 +102,7 @@ public class SecretController {
     private String validateVideoFile(MultipartFile videoFile) {
         String returnString = "";
         if (videoFile.getSize() > MAX_VIDEO_SIZE) {
-            returnString = "동영상 파일 크기는 최대 5.5GB까지만 허용됩니다.";
+            returnString = "동영상 파일 크기는 최대 10.5GB까지만 허용됩니다.";
         }
         String extension = getFileExtension(videoFile.getOriginalFilename());
         if (!extension.matches("mp4|mkv|avi|mov|wmv")) {

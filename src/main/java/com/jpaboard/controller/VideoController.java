@@ -1,5 +1,6 @@
 package com.jpaboard.controller;
 
+import com.jpaboard.dto.VideoDetailDto;
 import com.jpaboard.entity.Videos;
 import com.jpaboard.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,6 @@ public class VideoController {
             model.addAttribute("error", sub);
             return "video/videoForm";
         }
-
 
         // 동영상 파일 크기 및 확장자 검증
         String videoString = validateVideoFile(videoFile);
@@ -150,20 +150,22 @@ public class VideoController {
     @GetMapping("/video/{video_id}")
     public ModelAndView getVideoDetail(@PathVariable Long video_id) throws UnsupportedEncodingException {
         // 동영상 ID로 정보를 조회
-        Videos video = videoService.getVideoById(video_id);
-        String filePath = video.getVideo_url();
+        VideoDetailDto videoDetail  = videoService.getVideoDetailWithLikeCount(video_id);
+
+        String filePath = videoDetail.getVideoUrl();
         int lastIndexOfBackslash = filePath.lastIndexOf("\\");
         String fileName = filePath.substring(lastIndexOfBackslash + 1);
         System.out.println(fileName);
 
-        String subtitlePath = video.getSubtitle_file_path();
+        String subtitlePath = videoDetail.getSubtitleFilePath();
 
         // 조회된 비디오 정보를 뷰에 전달
         ModelAndView mv = new ModelAndView("video/videoDetail");
 
-        mv.addObject("video", video);
+        mv.addObject("video", videoDetail);
         mv.addObject("encodeUrl", fileName);
         mv.addObject("subtitlePath", subtitlePath);
+        mv.addObject("likeCount", videoDetail.getLikeCount()); // 좋아요 수 전달
         return mv; // 반환할 뷰의 이름
     }
 

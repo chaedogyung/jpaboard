@@ -1,16 +1,20 @@
 package com.jpaboard.entity;
 
-import lombok.Data;
+import lombok.*;
 
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "VIDEOS", schema = "STUDY")
 @Data
-public class Videos {
+@AllArgsConstructor
+@NoArgsConstructor
+public
+class Videos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,9 +52,12 @@ public class Videos {
     private Timestamp created_at; // 등록일
 
     @Column(name = "UPDATED_AT", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp updated_at; // 수정일 // The trigger for 'UPDATED_AT' is handled in the database, no need to implement it in the entity
+    private Timestamp updated_at; // 수정일
 
-    @Column(name="subtitle_file_path")
-    private String subtitle_file_path;
+    @Column(name = "SUBTITLE_FILE_PATH")
+    private String subtitle_file_path; // 자막 파일 경로
 
+    // VideoLikes와의 연관 관계 매핑 (OneToMany)
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VideoLikes> likes; // 좋아요 정보 리스트
 }

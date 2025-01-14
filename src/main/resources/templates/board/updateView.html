@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판</title>
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/board/updateView.css}">
+</head>
+<!-- 사용자 스크립트 추가 -->
+<body>
+<div layout:fragment="content" id="root">
+    <h4>게시판 수정</h4>
+    <hr>
+    <form name="updateForm" method="post" th:action="@{/board/boardUpdate}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label th:for="title" class="col-sm-2 control-label">제목</label>
+            <input type="text" id="title" name="title" class="chk form-control" th:value="${updateView.title}" required>
+        </div>
+        <div class="form-group">
+            <label th:for="content" class="col-sm-2 control-label">내용</label>
+            <textarea id="content" name="content" class="chk form-control" style="height: 300px;" th:text="${updateView.content}" required></textarea>
+        </div>
+        <div class="form-group">
+            <label th:for="writer" class="col-sm-2 control-label">작성자</label>
+            <input type="text" id="writer" name="writer" class="chk form-control" th:value="${updateView.writer}" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="file" name="file" multiple/>
+        </div>
+        <div class="form-group" id="fileIndex">
+
+        </div>
+        <div class="form-group">
+            <button class="write_btn btn btn-warning" type="submit">작성</button>
+            <button class="fileAdd_btn btn btn-primary" type="button">파일추가</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -8,11 +8,13 @@
     border-radius: 5px; /* Rounded corners */
     background-color: #f9f9f9; /* Light background color */
 }
+
 /* 댓글 목록 컨테이너 스타일 */
 .reply-section {
     margin: 20px 0;
     padding: 10px;
     border-top: 1px solid #ddd;
+    width: 45%;
 }
 
 .replyList {
@@ -100,4 +102,17 @@
 
 .reply-footer .btn-danger:hover {
     background-color: #c9302c;
+}
+
+.fileList {
+    border: 1px solid #dbdbdb;
+    width: 45%;
+}
+
+#content {
+    height: 200px;
+}
+
+.form-control {
+    width: 45%;
 }
