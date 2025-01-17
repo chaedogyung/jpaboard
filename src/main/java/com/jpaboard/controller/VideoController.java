@@ -1,10 +1,14 @@
 package com.jpaboard.controller;
 
 import com.jpaboard.dto.VideoDetailDto;
+import com.jpaboard.entity.VideoLikes;
 import com.jpaboard.entity.Videos;
 import com.jpaboard.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -148,14 +154,16 @@ public class VideoController {
 
     // 동영상 상세 페이지
     @GetMapping("/video/{video_id}")
-    public ModelAndView getVideoDetail(@PathVariable Long video_id) throws UnsupportedEncodingException {
+    public ModelAndView getVideoDetail(@PathVariable Long video_id) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userId = auth.getName();
         // 동영상 ID로 정보를 조회
-        VideoDetailDto videoDetail  = videoService.getVideoDetailWithLikeCount(video_id);
+        VideoDetailDto videoDetail = videoService.getVideoDetailWithLikeCount(video_id, userId);
 
         String filePath = videoDetail.getVideoUrl();
         int lastIndexOfBackslash = filePath.lastIndexOf("\\");
         String fileName = filePath.substring(lastIndexOfBackslash + 1);
-        System.out.println(fileName);
 
         String subtitlePath = videoDetail.getSubtitleFilePath();
 
@@ -165,9 +173,30 @@ public class VideoController {
         mv.addObject("video", videoDetail);
         mv.addObject("encodeUrl", fileName);
         mv.addObject("subtitlePath", subtitlePath);
-        mv.addObject("likeCount", videoDetail.getLikeCount()); // 좋아요 수 전달
+        mv.addObject("userId", userId);
         return mv; // 반환할 뷰의 이름
     }
+
+    @PostMapping(value="/like")
+    public ResponseEntity<Integer> addLike(@RequestParam("videoId") Long videoId,
+                                                            @RequestParam("userId") String userId) {
+        Integer success = videoService.addLike(videoId,userId);
+        return ResponseEntity.ok(success);
+    }
+
+    @DeleteMapping("/cancelLike")
+    public ResponseEntity<Integer> cancelLike(@RequestParam("videoId") Long videoId,
+                                              @RequestParam("userId") String userId) {
+        Integer success = videoService.cancelLike(videoId, userId);
+        return ResponseEntity.ok(success);
+    }
+
+    @GetMapping("/likeCount")
+    public ResponseEntity<Long> likeCount(Long videoId) {
+        Long likeCount = videoService.getLikesCountByVideoId(videoId);
+        return ResponseEntity.ok(likeCount);
+    }
+
 
     //동영상 관리 목록
     @GetMapping("/video/manage")
@@ -175,7 +204,6 @@ public class VideoController {
         model.addAttribute("videos", videoService.getAllVideos()); // "id" 기준 내림차순 정렬));
         return "video/videoManageList"; // 반환할 뷰의 이름
     }
-
 
     //좋아요 동영상 목록
     @GetMapping("/video/favoriteVideo")

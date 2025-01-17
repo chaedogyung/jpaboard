@@ -20,4 +20,5 @@ public class VideoDetailDto {
     private String language;    // 추가
     private String description; // 추가
     private Long likeCount;
+    private Integer isLikedByUser;
 }

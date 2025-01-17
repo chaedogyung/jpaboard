@@ -109,10 +109,10 @@
     <!-- videos가 있을 때만 동영상 목록을 출력 -->
     <div th:if="${videos != null and !videos.isEmpty()}" class="video-grid">
         <!-- 각 비디오 카드 -->
-        <div class="video-card" th:each="video : ${videos}" th:data-video-id="${video.video_id}">
+        <div class="video-card" th:each="video : ${videos}" th:data-video-id="${video.videoId}">
             <!-- 비디오 썸네일 -->
             <div class="video-thumbnail">
-                <a th:href="@{{video_id}(video_id=${video.video_id})}">
+                <a th:href="@{{videoId}(videoId=${video.videoId})}">
                     <img th:src="@{/images/{thumbnail_url}(thumbnail_url=${video.thumbnail_url})}" alt="썸네일">
                 </a>
             </div>

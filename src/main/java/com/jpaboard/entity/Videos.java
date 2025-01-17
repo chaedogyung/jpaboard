@@ -19,7 +19,7 @@ class Videos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "VIDEO_ID")
-    private Long video_id; // 비디오 ID (자동 증가, 고유 키)
+    private Long videoId; // 비디오 ID (자동 증가, 고유 키)
 
     @Column(name = "TITLE", nullable = false)
     private String title; // 비디오 제목

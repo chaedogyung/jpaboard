@@ -37,6 +37,9 @@ public class SecurityConfig {
                         .usernameParameter("useremail") // 사용자 이메일 파라미터
                         .failureHandler(new CustomAuthenticationFailureHandler()) // 로그인 실패 핸들러
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/members/login") // 사용자 지정 로그인 페이지
+                )
                 .logout(logoutCustomizer -> logoutCustomizer
                         .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout")) // 사용자 지정 로그아웃
                         .logoutSuccessUrl("/") // 로그아웃 후 리다이렉트

@@ -4,13 +4,91 @@
       layout:decorate="~{layouts/layout1}">
 <head>
     <title th:text="${video.title}">동영상 상세</title>
-
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet">
     <!-- Video.js JS -->
     <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/video/videoDetail.css}">
     <script>
+        $(document).ready(function () {
+            if ($(".like-button").val() == 1) {
+                $(".like-button").css({
+                    "background-color": "#ff0000",
+                    "color": "#fff"
+                });
+            } else {
+                $(".like-button").css({
+                    "background-color": "#fff",
+                    "color": "#ff0000"
+                });
+            }
+        });
+
+        $(document).ready(function () {
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+            $('.like-button').click(function () {
+                const button = $(this);
+                const videoId = button.data('video-id');
+                const userId = button.data('user-id');
+                let url = '/user/like';
+                let type = 'POST';
+
+                if (button.val() == 1) {
+                    url = '/user/cancelLike';
+                    type = 'DELETE';
+                }
+
+                $.ajax({
+                    url: url,
+                    type: type,
+                    data: {videoId, userId},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);
+                    },
+                    success: function (data) {debugger
+                        if (data == 1) {
+                            $(".like-button").val(data);
+                            $(".like-button").css({
+                                "background-color": "#ff0000",
+                                "color": "#fff"
+                            });
+                            likeCount()
+                        } else {
+                            $(".like-button").val(data);
+                            $(".like-button").css({
+                                "background-color": "#fff",
+                                "color": "#ff0000"
+                            });
+                            likeCount()
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+
+        function likeCount() {
+            const button =  $('.like-button');
+            const videoId = button.data('video-id');
+            $.ajax({
+                url: '/user/likeCount',
+                type: 'get',
+                data: {videoId},
+                success: function (data) {
+                    $('#likeCount').text(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
         // Video.js 초기화
         var player = videojs('my-video', {
             controls: true,
@@ -20,12 +98,12 @@
             fluid: true
         });
 
-        player.on('ended', function() {
+        player.on('ended', function () {
             alert('동영상이 종료되었습니다.');
         });
 
         // 자막 기본 설정
-        player.ready(function() {
+        player.ready(function () {
             var tracks = player.textTracks(); // 자막 트랙 가져오기
             for (var i = 0; i < tracks.length; i++) {
                 if (tracks[i].language === 'ko') {
@@ -44,6 +122,7 @@
                 player.currentTime(player.currentTime() - 5);
             }
         });
+
     </script>
 </head>
 <body>
@@ -64,8 +143,30 @@
             <source th:src="@{/videoUploads/{encodeUrl}(encodeUrl=${encodeUrl})}" type="video/mp4">
 
             <!-- 자막 (한국어) -->
-            <track th:src="@{/videoUploads/{subtitlePath}(subtitlePath=${subtitlePath})}" kind="subtitles" srclang="ko" label="한국어" id="sub" default />
+            <track th:src="@{/videoUploads/{subtitlePath}(subtitlePath=${subtitlePath})}" kind="subtitles" srclang="ko"
+                   label="한국어" id="sub" default/>
         </video>
+    </div>
+    <div class="like-container">
+        <!-- 값이 1일 때 보여지는 버튼 -->
+        <button class="like-button"
+                th:if="${video.isLikedByUser == 1}"
+                th:value="${video.isLikedByUser}"
+                th:data-video-id="${video.videoId}"
+                th:data-user-id="${userId}">
+            Liked
+        </button>
+
+        <!-- 값이 0일 때 보여지는 버튼 -->
+        <button class="like-button"
+                th:if="${video.isLikedByUser == 0}"
+                th:value="${video.isLikedByUser}"
+                th:data-video-id="${video.videoId}"
+                th:data-user-id="${userId}">
+            Like
+        </button>
+        <!-- 좋아요 개수 출력 -->
+        <span id="likeCount" th:text="${video.likeCount}"></span>
     </div>
 
     <!-- 동영상 정보 -->

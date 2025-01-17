@@ -5,6 +5,7 @@ import com.jpaboard.entity.QVideoLikes;
 import com.jpaboard.entity.QVideos;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,14 +17,14 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public VideoDetailDto findVideoDetailWithLikeCount(Long videoId) {
+    public VideoDetailDto findVideoDetailWithLikeCount(Long videoId, String userId) {
         QVideos video = QVideos.videos;
         QVideoLikes like = QVideoLikes.videoLikes;
 
         return queryFactory
                 .select(Projections.constructor(
                         VideoDetailDto.class,
-                        video.video_id,
+                        video.videoId,
                         video.title,
                         video.video_url,
                         video.subtitle_file_path,
@@ -32,13 +33,20 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
                         video.genre,
                         video.language,
                         Expressions.stringTemplate("TO_CHAR({0})", video.description), // SQL 변환
-                        like.like_id.count()
+                        like.like_id.count(),
+                        Expressions.cases().when(JPAExpressions.selectOne()
+                                        .from(like)
+                                        .where(like.video.videoId.eq(video.videoId)
+                                                .and(like.userid.userid.eq(userId)))
+                                        .exists())
+                                .then(1)
+                                .otherwise(0).as("isLikedByUser")
                 ))
                 .from(video)
-                .leftJoin(like).on(like.video.video_id.eq(video.video_id))
-                .where(video.video_id.eq(videoId))
+                .leftJoin(like).on(like.video.videoId.eq(video.videoId))
+                .where(video.videoId.eq(videoId))
                 .groupBy(
-                        video.video_id,
+                        video.videoId,
                         video.title,
                         video.video_url,
                         video.subtitle_file_path,
@@ -46,7 +54,7 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
                         video.age_rating,
                         video.genre,
                         video.language,
-                        video.description // CLOB 필드도 그룹화에 포함
+                        video.description
                 )
                 .fetchOne();
     }

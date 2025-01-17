@@ -28,17 +28,17 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="item, iterStat : ${videos}" class="video-card" th:data-video-id="${item.video_id}">
+                    <tr th:each="item, iterStat : ${videos}" class="video-card" th:data-video-id="${item.videoId}">
                         <td class="number-col" th:text="${iterStat.index+1}"></td>
                         <td class="title-col" th:text="${#strings.abbreviate(item.title, 20)}"></td>
                         <td class="genre-col" th:text="${#strings.abbreviate(item.genre, 15)}"></td>
                         <td class="release-date-col" th:text="${item.release_date}"></td>
                         <td class="description-col" th:text="${#strings.abbreviate(item.description, 30)}"></td>
                         <td class="action-col">
-                            <a th:href="@{/video/edit(video_id=${item.video_id})}" class="btn btn-primary">수정</a>
+                            <a th:href="@{/video/edit(videoId=${item.videoId})}" class="btn btn-primary">수정</a>
                         </td>
                         <td class="action-col">
-                            <form th:action="@{/video/delete(video_id=${item.video_id})}" method="post" onsubmit="return confirm('삭제하시겠습니까?');">
+                            <form th:action="@{/video/delete(videoId=${item.videoId})}" method="post" onsubmit="return confirm('삭제하시겠습니까?');">
                                 <button type="submit" class="btn btn-danger">삭제</button>
                             </form>
                         </td>
