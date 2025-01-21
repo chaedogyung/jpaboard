@@ -1,5 +1,6 @@
 package com.jpaboard.config;
 
+import com.jpaboard.config.oauth.PrincipalOauth2Service;
 import com.jpaboard.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    PrincipalOauth2Service principalOauth2Service;
 
     @Autowired
     MemberService memberService;
@@ -39,6 +43,8 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/members/login") // 사용자 지정 로그인 페이지
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(principalOauth2Service))// 사용자 정의 OAuth2 서비스 연결
                 )
                 .logout(logoutCustomizer -> logoutCustomizer
                         .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout")) // 사용자 지정 로그아웃

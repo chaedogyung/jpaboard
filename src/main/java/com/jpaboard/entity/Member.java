@@ -37,6 +37,12 @@ public class Member {
     @Column(name = "ROLE", nullable = false)
     private Role role;
 
+    @Column(name = "PROVIDER")
+    private String provider;
+
+    @Column(name = "PROVIDERID")
+    private String providerId;
+
     @Column(name = "REGDATE", nullable = false)
     private LocalDateTime regdate;
 

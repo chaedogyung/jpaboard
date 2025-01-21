@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,8 +47,12 @@ public class BoardController {
 
     //게시판 글쓰기 뷰
     @GetMapping(value = "/writeView")
-    public String writeView() {
+    public String writeView(Model model) {
         logger.info("writeView");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userId = auth.getName();
+        model.addAttribute("userId", userId);
+
         return "board/writeView";
     }
 
