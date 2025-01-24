@@ -1,15 +1,14 @@
 package com.jpaboard.controller;
 
-import com.jpaboard.config.oauth.PrincipalDetails;
+//import com.jpaboard.config.oauth.PrincipalDetails;
+import com.jpaboard.constant.Role;
 import com.jpaboard.dto.MemberFormDto;
 import com.jpaboard.entity.Member;
 import com.jpaboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,26 +23,26 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @GetMapping(value = "/test/login")
-    public String testLogin(Authentication authentication
-            , @AuthenticationPrincipal PrincipalDetails userDetails) {
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println("authentication :" + principalDetails.getMember());
-        System.out.println("userDetails :" + userDetails.getMember());
-        return "세션정보 확인하기";
-    }
-
-    @GetMapping(value = "/test/oauth/login")
-    public String testOAuthLogin(
-            Authentication authentication) {
-
-        OAuth2User auth2User = (OAuth2User) authentication.getPrincipal();
-        System.out.println("authentication :" + auth2User.getAttributes());
-
-        return "Oauth 세션정보 확인하기";
-    }
+//    @GetMapping(value = "/test/login")
+//    public String testLogin(Authentication authentication
+//            , @AuthenticationPrincipal PrincipalDetails userDetails) {
+//        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+//        System.out.println("authentication :" + principalDetails.getMember());
+//        System.out.println("userDetails :" + userDetails.getMember());
+//        return "세션정보 확인하기";
+//    }
+//
+//    @GetMapping(value = "/test/oauth/login")
+//    public String testOAuthLogin(
+//            Authentication authentication) {
+//
+//        OAuth2User auth2User = (OAuth2User) authentication.getPrincipal();
+//        System.out.println("authentication :" + auth2User.getAttributes());
+//
+//        return "Oauth 세션정보 확인하기";
+//    }
 
     @GetMapping(value = "/newReg")
     public String memberForm(Model model) {
@@ -52,7 +51,7 @@ public class MemberController {
     }
 
     @PostMapping(value = "/new")
-    public String newMember(@Valid MemberFormDto memberFormDto,
+    public String newMember(@Valid Member member,
                             BindingResult bindingResult,
                             Model model) {
 
@@ -61,14 +60,18 @@ public class MemberController {
         }
 
         try {
-            Member member = Member.createMember(memberFormDto, passwordEncoder);
+
+            String rawPassword = member.getUserpass();
+            String encodedPassword = bCryptPasswordEncoder.encode(rawPassword);
+            member.setRole(Role.SECRET);
+            member.setUserpass(encodedPassword);
+
             memberService.saveMember(member);
+            return "redirect:/member/memberForm";
         } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "member/memberForm";
         }
-
-        return "redirect:/";
     }
 
     @GetMapping(value = "/login")

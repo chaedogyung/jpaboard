@@ -1,5 +1,6 @@
 package com.jpaboard.service;
 
+import com.jpaboard.config.oauth.PrincipalDetails;
 import com.jpaboard.entity.Member;
 import com.jpaboard.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -35,19 +36,20 @@ public class MemberService implements UserDetailsService {
         }
     }
 
+    //시큐리티 session(내부 Authentication (내부 UserDetails))
+    //함수 종료시 @AuthenticationPrincipal 어노테이션이 만들어진다.
+    //시큐리티 설정에서 loginProcessingUrl("/login")
+    //login 요청이 오면 자동으로 UserDetailsService 타입으로 loC되어 있는 loadUserByUsername 함수가 실행
     @Override
-    public UserDetails loadUserByUsername(String useremail) throws UsernameNotFoundException {
-        Member member = memberRepository.findByUseremail(useremail);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Member member = memberRepository.findByUseremail(username);
 
-        if (member == null) {
-            throw new UsernameNotFoundException(useremail);
+        if (member != null) {
+            System.out.println(member.getRole());
+            return new PrincipalDetails(member);
+
+        } else {
+            return null;
         }
-
-        return User.builder()
-                .username(member.getUsername())
-                .password(member.getUserpass())
-                .roles(member.getRole().toString())
-                .build();
-
     }
 }

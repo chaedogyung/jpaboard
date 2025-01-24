@@ -6,13 +6,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "MP_BOARD", schema = "STUDY") // 스키마 통일
-@Getter
-@Setter
-@ToString
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "MP_BOARD", schema = "STUDY") // 스키마 통일
 @SequenceGenerator(
         name = "mp_board_seq_generator",
         sequenceName = "mp_board_seq",
@@ -43,6 +42,10 @@ public class BoardVO {
     @OneToMany(mappedBy = "boardVO", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<MpReply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "boardVO", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<BoardFile> files = new ArrayList<>(); // 첨부파일 목록
 
     // 엔티티 생성 시 기본값 설정
     @PrePersist

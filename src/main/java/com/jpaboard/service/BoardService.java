@@ -1,9 +1,11 @@
 package com.jpaboard.service;
 
-import com.jpaboard.entity.BoardFile;
-import com.jpaboard.entity.BoardVO;
+import com.jpaboard.entity.*;
 import com.jpaboard.repository.BoardFileRepository;
 import com.jpaboard.repository.BoardRepository;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import static com.jpaboard.entity.QBoardFile.boardFile;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardFileRepository boardFileRepository;
     public final String filePath = "E:/boardFile";
+    private final JPAQueryFactory queryFactory;
 
     public BoardVO saveBoard(BoardVO boardVO, MultipartFile[] files) {
 
@@ -68,5 +73,25 @@ public class BoardService {
 
     public List<BoardFile> findFilesByBno(Long bno) {
         return boardFileRepository.findByBno(bno);
+    }
+
+    public BoardVO readWithFiles(Long bno) {
+
+        QBoardVO board = QBoardVO.boardVO;
+        QBoardFile file = boardFile;
+
+        List<Tuple> results =queryFactory
+                .select(board,file)
+                .from(board)
+                .leftJoin(board.files, file).fetchJoin()
+                .where(board.bno.eq(bno))
+                .fetch();
+
+        if (results.isEmpty()) {
+            throw new IllegalArgumentException("게시글을 찾을 수 없습니다. bno: " + bno);
+        }
+
+        return results.get(0).get(board);
+
     }
 }

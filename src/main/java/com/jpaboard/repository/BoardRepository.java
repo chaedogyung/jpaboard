@@ -1,6 +1,7 @@
 package com.jpaboard.repository;
 
 import com.jpaboard.entity.BoardVO;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -22,5 +23,4 @@ public interface BoardRepository extends JpaRepository<BoardVO, Long>, QuerydslP
 
     @Query(value = "select * from mp_board i where i.content like %:content% order by i.bno desc", nativeQuery = true)
     List<BoardVO> findByContentByNative(String content);
-
 }

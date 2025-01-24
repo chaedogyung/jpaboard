@@ -2,6 +2,7 @@ package com.jpaboard.controller;
 
 import com.jpaboard.entity.BoardFile;
 import com.jpaboard.entity.BoardVO;
+import com.jpaboard.entity.Member;
 import com.jpaboard.entity.MpReply;
 import com.jpaboard.service.BoardFileService;
 import com.jpaboard.service.BoardService;
@@ -75,12 +76,22 @@ public class BoardController {
     }
 
     //게시판 수정 뷰
-    @GetMapping(value = "/boardUpdate")
-    public String updateView(Model model, @RequestParam("bno") Long bno) {
+    @GetMapping(value = "/boardUpdateView")
+    public String boardUpdateView(Model model, @RequestParam("bno") Long bno) {
         logger.info("updateView");
-        model.addAttribute("updateView", boardService.read(bno));
+        BoardVO boardVO = boardService.readWithFiles(bno);
+
+        model.addAttribute("updateView", boardVO);
         return "board/updateView";
     }
+//
+//    //게시판 수정
+//    @GetMapping(value = "/boardUpdate")
+//    public String boardUpdate(BoardVO boardVO) {
+//        logger.info("boardUpdate");
+//        boardService.boardUpdate(boardVO);
+//        return"redirect:/board/readView?bno=" + boardVO.getBno();
+//    }
 
     //게시판 목록 뷰
     @GetMapping(value = "/boardList")

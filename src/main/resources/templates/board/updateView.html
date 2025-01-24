@@ -19,11 +19,19 @@
         </div>
         <div class="form-group">
             <label th:for="content" class="col-sm-2 control-label">내용</label>
-            <textarea id="content" name="content" class="chk form-control" style="height: 300px;" th:text="${updateView.content}" required></textarea>
+            <textarea id="content" name="content" class="chk form-control" th:text="${updateView.content}" required></textarea>
         </div>
         <div class="form-group">
             <label th:for="writer" class="col-sm-2 control-label">작성자</label>
-            <input type="text" id="writer" name="writer" class="chk form-control" th:value="${updateView.writer}" required/>
+            <input type="text" id="writer" name="writer" class="chk form-control" th:value="${updateView.writer}" readonly/>
+        </div>
+
+        <span>파일 목록</span>
+        <div class="form-group fileList">
+            <th:block th:each="file : ${updateView.files}">
+                <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|" th:text="${file.orgFileName}"></a>
+                <span th:text="${file.fileSize} + 'kb'"></span><br>
+            </th:block>
         </div>
 
         <div class="form-group">

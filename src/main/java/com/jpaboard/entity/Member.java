@@ -3,18 +3,15 @@ package com.jpaboard.entity;
 import com.jpaboard.constant.Role;
 import com.jpaboard.dto.MemberFormDto;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mp_member")
-@Getter
-@Setter
-@ToString
+@Data
+@NoArgsConstructor
 public class Member {
 
     @Id
@@ -52,15 +49,18 @@ public class Member {
         this.regdate = LocalDateTime.now();
     }
 
-    public static Member createMember(MemberFormDto memberFormDto,
-                                      PasswordEncoder passwordEncoder) {
-        Member member = new Member();
-        member.setUserid(memberFormDto.getUserid()); // 사용자가 입력한 ID 설정
-        member.setUserpass(passwordEncoder.encode(memberFormDto.getUserpass()));
-        member.setUsername(memberFormDto.getUsername());
-        member.setUseremail(memberFormDto.getUseremail());
-        member.setUseraddress(memberFormDto.getUseraddress());
-        member.setRole(Role.USER);
-        return member;
+    @Builder
+    public Member(String userid, String username, String useremail,
+                  String userpass, String useraddress, Role role,
+                  String provider, String providerId, LocalDateTime regdate) {
+        this.userid = userid;
+        this.username = username;
+        this.useremail = useremail;
+        this.userpass = userpass;
+        this.useraddress = useraddress;
+        this.role = role;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.regdate = regdate;
     }
 }
