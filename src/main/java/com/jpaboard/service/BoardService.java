@@ -64,7 +64,7 @@ public class BoardService {
         return saveBoard;
     }
 
-    public Page<BoardVO> boardList(Pageable pageable, BoardVO boardVo) {
+    public Page<BoardVO> boardList(Pageable pageable) {
         return boardRepository.findAll(pageable);
     }
 

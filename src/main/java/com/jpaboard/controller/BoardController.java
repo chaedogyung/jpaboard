@@ -127,7 +127,8 @@ public class BoardController {
         logger.info("boardList");
 
         // 내림차순 정렬을 위한 PageRequest 생성
-        Page<BoardVO> boardList = boardService.boardList(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno")),boardVo); // "id" 기준 내림차순 정렬
+        Page<BoardVO> boardList =
+                boardService.boardList(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno"))); // "id" 기준 내림차순 정렬
 
         int totalPages = boardList.getTotalPages();
         int startPage = Math.max(0, page - 5); // 현재 페이지 기준으로 앞 5페이지
