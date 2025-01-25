@@ -4,9 +4,11 @@ import com.jpaboard.entity.*;
 import com.jpaboard.repository.BoardFileRepository;
 import com.jpaboard.repository.BoardRepository;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ public class BoardService {
     private final BoardFileRepository boardFileRepository;
     public final String filePath = "E:/boardFile";
     private final JPAQueryFactory queryFactory;
+    private final EntityManager em;
 
     public BoardVO saveBoard(BoardVO boardVO, MultipartFile[] files) {
 
@@ -61,7 +64,7 @@ public class BoardService {
         return saveBoard;
     }
 
-    public Page<BoardVO> boardList(Pageable pageable) {
+    public Page<BoardVO> boardList(Pageable pageable, BoardVO boardVo) {
         return boardRepository.findAll(pageable);
     }
 
@@ -80,8 +83,8 @@ public class BoardService {
         QBoardVO board = QBoardVO.boardVO;
         QBoardFile file = boardFile;
 
-        List<Tuple> results =queryFactory
-                .select(board,file)
+        List<Tuple> results = queryFactory
+                .select(board, file)
                 .from(board)
                 .leftJoin(board.files, file).fetchJoin()
                 .where(board.bno.eq(bno))
@@ -93,5 +96,46 @@ public class BoardService {
 
         return results.get(0).get(board);
 
+    }
+
+    public void boardUpdate(@Valid BoardVO boardVO, MultipartFile[] files, List<String> fileNoList, List<String> delGbList) {
+        QBoardVO board = QBoardVO.boardVO;
+        QBoardFile boardFile = QBoardFile.boardFile;
+        new JPAUpdateClause(em, board)
+                .set(board.title, boardVO.getTitle())
+                .set(board.content, boardVO.getContent())
+                .set(board.updateRegDate, boardVO.getUpdateRegDate())
+                .where(board.bno.eq(boardVO.getBno()))
+                .execute();
+
+
+        for (int i = 0; i < fileNoList.size(); i++) {
+            new JPAUpdateClause(em, boardFile)
+                    .set(boardFile.delGb, delGbList.get(i))
+                    .where(boardFile.fileNo.eq(Long.valueOf(fileNoList.get(i))))
+                    .execute();
+        }
+
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                try{
+                    //서버에 파일저장
+                    String orgFileName = file.getOriginalFilename();
+                    String storedFileName = UUID.randomUUID().toString();
+                    File targetFile = new File(filePath, orgFileName);
+                    file.transferTo(targetFile);
+
+                    //파일정보 저장
+                    BoardFile boardFile1 = new BoardFile();
+                    boardFile1.setBno(boardVO.getBno());
+                    boardFile1.setOrgFileName(orgFileName);
+                    boardFile1.setStoredFileName(storedFileName);
+                    boardFile1.setFileSize(file.getSize());
+                    boardFileRepository.save(boardFile1);
+                } catch (Exception e) {
+                    throw new RuntimeException("파일 저장 중 오류 발생: " + e.getMessage());
+                }
+            }
+        }
     }
 }

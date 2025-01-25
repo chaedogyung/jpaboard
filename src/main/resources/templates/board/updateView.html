@@ -8,40 +8,89 @@
     <link rel="stylesheet" th:href="@{/css/board/updateView.css}">
 </head>
 <!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $(".fileAdd_btn").on("click", function () {
+                $("#fileIndex").append(
+                    "<div class=\"form-group\">" +
+                    "<input type='file' style='float:left;' name='file'>" +
+                    "<button type='button' style='float:right;' id='fileDelBtn'>" + "삭제" + "</button>" +
+                    "</div>");
+            })
+        })
+
+        $(document).on("click", "#fileDelBtn", function () {
+            $(this).parent().remove();
+        });
+
+        $(document).ready(function () {
+            // 삭제 버튼 클릭 이벤트 핸들러
+            $('.file-del-btn').on('click', function () {
+                const $fileItem = $(this).closest('.file-item'); // .file-item 부모 요소 선택
+                const $link = $fileItem.find('a'); // a 태그 선택
+                const delGb = $('input[name="delGb"]');
+                // a 태그의 data-delGb 속성을 Y로 변경
+                $link.attr('data-delGb', 'Y');
+                delGb.val("Y");
+                // 시각적 효과 추가
+                $fileItem.addClass('deleted'); // .deleted 클래스 추가
+                $fileItem.find('span').text('삭제됨'); // 상태 표시 변경
+            });
+        });
+    </script>
+</th:block>
 <body>
 <div layout:fragment="content" id="root">
     <h4>게시판 수정</h4>
     <hr>
     <form name="updateForm" method="post" th:action="@{/board/boardUpdate}" enctype="multipart/form-data">
+        <input type="hidden" name="bno" th:value="${updateView.bno}">
         <div class="form-group">
             <label th:for="title" class="col-sm-2 control-label">제목</label>
             <input type="text" id="title" name="title" class="chk form-control" th:value="${updateView.title}" required>
         </div>
         <div class="form-group">
             <label th:for="content" class="col-sm-2 control-label">내용</label>
-            <textarea id="content" name="content" class="chk form-control" th:text="${updateView.content}" required></textarea>
+            <textarea id="content" name="content" class="chk form-control" th:text="${updateView.content}"
+                      required></textarea>
         </div>
         <div class="form-group">
             <label th:for="writer" class="col-sm-2 control-label">작성자</label>
-            <input type="text" id="writer" name="writer" class="chk form-control" th:value="${updateView.writer}" readonly/>
+            <input type="text" id="writer" name="writer" class="chk form-control" th:value="${updateView.writer}"
+                   readonly/>
         </div>
 
         <span>파일 목록</span>
         <div class="form-group fileList">
-            <th:block th:each="file : ${updateView.files}">
-                <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|" th:text="${file.orgFileName}"></a>
-                <span th:text="${file.fileSize} + 'kb'"></span><br>
+            <th:block th:each="file, iterStat : ${updateView.files}" th:if="${delGb[iterStat.index]} == N">
+                <div class="file-item">
+                    <input type="hidden" name="fileNo" th:value="${file.fileNo}"/>
+                    <input type="hidden" name="delGb" th:value="${file.delGb}"/>
+                    <a href="#"
+                       th:if="${delGb[iterStat.index]} == N"
+                       th:text="${file.orgFileName}"
+                       th:data-delGb="${delGb[iterStat.index]}"></a>
+                    <span th:text="${file.fileSize} + 'kb'"></span>
+                    <button type="button" class="file-del-btn">삭제</button>
+                </div>
             </th:block>
         </div>
 
-        <div class="form-group">
-            <input type="file" name="file" multiple/>
+        <div class="form-group" id="fileAddOne">
+            <input type="file" name="file" multiple/> <br>
+            <button type="button" id="fileDelBtn">삭제</button>
         </div>
+
         <div class="form-group" id="fileIndex">
 
         </div>
+
         <div class="form-group">
             <button class="write_btn btn btn-warning" type="submit">작성</button>
+            <button class="updateCancel btn btn-danger" type="button"
+                    th:onclick="|location.href='/board/readView?bno=' + ${updateView.bno}|">취소
+            </button>
             <button class="fileAdd_btn btn btn-primary" type="button">파일추가</button>
         </div>
     </form>

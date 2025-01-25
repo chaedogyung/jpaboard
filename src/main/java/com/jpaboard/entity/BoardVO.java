@@ -1,5 +1,6 @@
 package com.jpaboard.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -35,6 +36,9 @@ public class BoardVO {
 
     @Column(name = "REGDATE", updatable = false)
     private LocalDateTime regDate;
+
+    @Column(name = "UPDATEREGDATE", updatable = false)
+    private LocalDateTime updateRegDate;
 
     @Column(name = "HIT", nullable = false)
     private Long hit = 0L;

@@ -203,7 +203,7 @@
     </div>
     <div class="form-group">
         <label for="content" class="col-sm-2 control-label">내용</label>
-        <textarea id="content" name="content" th:text="${read.content}" class="form-control read-content" readonly style="width:45%"/>
+        <textarea id="content" name="content" th:text="${read.content}" class="form-control read-content" readonly/>
     </div>
     <div class="form-group">
         <label for="writer" class="col-sm-2 control-label">작성자</label>
@@ -217,8 +217,11 @@
 
     <span>파일 목록</span>
     <div class="form-group fileList">
-        <th:block th:each="file : ${file}">
-            <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|" th:text="${file.orgFileName}"></a>
+        <th:block th:each="file, iterStat : ${file}" th:if="${file.delGb} == N">
+            <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|"
+               th:text="${file.orgFileName}"
+               th:data-delGb="${file.delGb}">
+            </a>
             <span th:text="${file.fileSize} + 'kb'"></span><br>
         </th:block>
     </div>

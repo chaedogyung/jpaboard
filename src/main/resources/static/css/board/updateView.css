@@ -1,3 +1,85 @@
 #content {
     height: 300px;
 }
+
+#fileAddOne {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 인풋과 버튼 사이 간격 */
+}
+
+#fileAddOne input[type="file"] {
+    flex: 1; /* 필요 시 너비를 조정 */
+}
+
+#fileAddOne button {
+    flex-shrink: 0; /* 버튼 크기가 줄어들지 않도록 설정 */
+}
+
+#fileIndex .form-group {
+    display: flex; /* Use flexbox to align items */
+    align-items: center; /* Vertically align items */
+    margin-bottom: 10px; /* Add some space between rows */
+}
+
+#fileIndex input[type="file"] {
+    flex: 1; /* Allow file input to take available space */
+    margin-right: 10px; /* Add spacing between file input and button */
+}
+
+#fileIndex button {
+    flex-shrink: 0; /* Prevent the button from shrinking */
+    cursor: pointer; /* Make the button visually interactive */
+}
+
+#fileDelBtn {
+    margin-right: 1200px;
+}
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 요소 간 간격 */
+    margin-bottom: 8px; /* 파일 항목 간 간격 */
+    justify-content: flex-start; /* 모든 요소를 왼쪽 정렬 */
+}
+
+.file-item a {
+    flex: 0 0 auto; /* 링크의 크기를 고정 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: #007bff; /* 링크 색상 설정 */
+    max-width: 50%; /* 링크의 최대 너비 제한 */
+    overflow: hidden; /* 긴 텍스트가 넘치지 않도록 설정 */
+    text-overflow: ellipsis; /* 넘친 텍스트를 ...로 표시 */
+    white-space: nowrap; /* 한 줄로 표시 */
+}
+
+.file-item span {
+    flex: 0 0 auto; /* 파일 크기 태그 고정 */
+    white-space: nowrap; /* 한 줄 유지 */
+    margin-right: 8px; /* 삭제 버튼과 간격 조정 */
+    color: #6c757d; /* 보조 색상 */
+}
+
+.file-item .file-del-btn {
+    flex-shrink: 0; /* 버튼 크기 고정 */
+    background-color: #dc3545; /* 삭제 버튼 색상 */
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.file-item .file-del-btn:hover {
+    background-color: #c82333; /* 호버 시 색상 변경 */
+}
+
+.file-item.deleted {
+    text-decoration: line-through; /* 텍스트에 가로줄 */
+    opacity: 0.6; /* 시각적으로 흐려짐 */
+    pointer-events: none; /* 더 이상 상호작용 불가 */
+}
+
+.file-item.deleted .file-del-btn {
+    display: none; /* 삭제 버튼 감춤 */
+}

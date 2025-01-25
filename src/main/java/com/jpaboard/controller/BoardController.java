@@ -1,8 +1,8 @@
 package com.jpaboard.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jpaboard.entity.BoardFile;
 import com.jpaboard.entity.BoardVO;
-import com.jpaboard.entity.Member;
 import com.jpaboard.entity.MpReply;
 import com.jpaboard.service.BoardFileService;
 import com.jpaboard.service.BoardService;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -81,25 +82,52 @@ public class BoardController {
         logger.info("updateView");
         BoardVO boardVO = boardService.readWithFiles(bno);
 
+        int fileSize = boardVO.getFiles().size();
+        List<String> delGb = new ArrayList<>();
+        for (int i = 0; i < fileSize; i++) {
+            delGb.add(boardVO.getFiles().get(i).getDelGb());
+        }
+
         model.addAttribute("updateView", boardVO);
+        model.addAttribute("delGb", delGb);
+
         return "board/updateView";
     }
-//
-//    //게시판 수정
-//    @GetMapping(value = "/boardUpdate")
-//    public String boardUpdate(BoardVO boardVO) {
-//        logger.info("boardUpdate");
-//        boardService.boardUpdate(boardVO);
-//        return"redirect:/board/readView?bno=" + boardVO.getBno();
-//    }
+
+    //게시판 수정
+    @PostMapping(value = "/boardUpdate")
+    public String boardUpdate(@Valid BoardVO boardVO,
+                              BindingResult bindingResult,
+                              @RequestParam("file") MultipartFile[] files,
+                              @RequestParam(value = "fileNo", required = false, defaultValue = "") List<String> fileNoList,
+                              @RequestParam(value = "delGb", required = false, defaultValue = "") List<String> delGbList,
+                              Model model) {
+        logger.info("boardUpdate");
+
+        if (bindingResult.hasErrors()) {
+            return "board/writeView";
+        }
+        try {
+            boardService.boardUpdate(boardVO, files, fileNoList, delGbList);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "redirect:/board/readView?bno=" + boardVO.getBno();
+        }
+        return "redirect:/board/readView?bno=" + boardVO.getBno();
+    }
 
     //게시판 목록 뷰
     @GetMapping(value = "/boardList")
-    public String boardList(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+    public String boardList(@RequestParam(value = "page", defaultValue = "0") int page,
+                            @RequestParam(value = "title", required = false, defaultValue = "") String title,
+                            @RequestParam(value = "writer", required = false, defaultValue = "") String writer,
+                            @RequestParam(value = "content", required = false, defaultValue = "") String content,
+                            @RequestParam(value = "fullSearch", required = false, defaultValue = "") String fullSearch,
+                            Model model) {
         logger.info("boardList");
 
         // 내림차순 정렬을 위한 PageRequest 생성
-        Page<BoardVO> boardList = boardService.boardList(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno"))); // "id" 기준 내림차순 정렬
+        Page<BoardVO> boardList = boardService.boardList(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno")),boardVo); // "id" 기준 내림차순 정렬
 
         int totalPages = boardList.getTotalPages();
         int startPage = Math.max(0, page - 5); // 현재 페이지 기준으로 앞 5페이지

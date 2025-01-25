@@ -4,7 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <title>게시판</title>
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/board/boardList.css}">
 </head>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+    $(document).ready(function() {
+        //셀렉트 태그 값이 변경될 때마다 실행
+        $('select[name="searchType"]').on('change', function() {
+            var selectedValue = $(this).val();//선택된 value 값을 가져옴
+            $('#keywordInput').attr('name', selectedValue);//인풋태그의 네임 속성 변경
+        })
+    })
+
+    </script>
+</th:block>
 <body>
 <div layout:fragment="content" id="root">
     <h4>게시판</h4>
@@ -31,6 +45,27 @@
                 <td th:text="${item.hit}"></td>
             </tr>
         </table>
+
+        <div class="search">
+            <!-- 드롭다운 메뉴 -->
+            <label>
+                <select name="searchType" class="form-control">
+                    <option value="fullSearch">전체</option>
+                    <option value="title">제목</option>
+                    <option value="content">내용</option>
+                    <option value="writer">작성자</option>
+                </select>
+            </label>
+
+            <!-- 검색 입력창과 버튼 -->
+            <div class="input-group">
+                <label for="keywordInput" style="display: none;">검색</label>
+                <input type="text" name="keyword" id="keywordInput" class="form-control"/>
+                <span class="input-group-btn">
+                    <button id="searchBtn" type="button" class="btn btn-default">검색</button>
+                </span>
+            </div>
+        </div>
     </form>
 
     <!-- Pagination -->
