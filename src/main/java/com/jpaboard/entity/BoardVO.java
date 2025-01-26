@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "MP_BOARD", schema = "STUDY") // 스키마 통일
+@Table(name = "MP_BOARD") // 스키마 통일
 @SequenceGenerator(
         name = "mp_board_seq_generator",
         sequenceName = "mp_board_seq",
