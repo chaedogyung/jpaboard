@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "MP_FILE", schema = "STUDY")
+@Table(name = "MP_FILE")
 @ToString
 @AllArgsConstructor
 @SequenceGenerator(

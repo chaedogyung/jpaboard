@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "VIDEOS", schema = "STUDY")
+@Table(name = "VIDEOS")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

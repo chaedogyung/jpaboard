@@ -63,7 +63,7 @@ public class MemberController {
 
             String rawPassword = member.getUserpass();
             String encodedPassword = bCryptPasswordEncoder.encode(rawPassword);
-            member.setRole(Role.SECRET);
+            member.setRole(Role.ADMIN);
             member.setUserpass(encodedPassword);
 
             memberService.saveMember(member);
