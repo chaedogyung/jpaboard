@@ -1,5 +1,6 @@
 package com.jpaboard.service;
 
+import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.*;
 import com.jpaboard.repository.BoardFileRepository;
 import com.jpaboard.repository.BoardRepository;
@@ -64,8 +65,8 @@ public class BoardService {
         return saveBoard;
     }
 
-    public Page<BoardVO> boardList(Pageable pageable) {
-        return boardRepository.findAll(pageable);
+    public Page<BoardVO> boardList(Pageable pageable, SearchDto searchDto) {
+        return boardRepository.searchBoards(searchDto, pageable);
     }
 
     // 상세 조회 메서드

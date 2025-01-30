@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface BoardRepository extends JpaRepository<BoardVO, Long>, QuerydslPredicateExecutor<BoardVO> {
+public interface BoardRepository extends JpaRepository<BoardVO, Long>, QuerydslPredicateExecutor<BoardVO>, BoardRepositoryCustom {
 
     List<BoardVO> findByTitle(String title);
     BoardVO findByBno(Long bno);
