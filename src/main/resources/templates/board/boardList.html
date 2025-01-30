@@ -15,6 +15,10 @@
             var selectedValue = $(this).val();//선택된 value 값을 가져옴
             $('#keywordInput').attr('name', selectedValue);//인풋태그의 네임 속성 변경
         })
+
+        $('select[name="searchType"] option[value="fullSearch"]').prop('selected', true);
+        $('#keywordInput').attr('name', "fullSearch");//인풋태그의 네임 속성 변경
+
     })
 
     </script>
@@ -23,7 +27,7 @@
 <div layout:fragment="content" id="root">
     <h4>게시판</h4>
     <br>
-    <form method="get" role="form">
+    <form method="get" role="form" th:action="@{/board/boardList}">
         <table class="table table-hover">
             <tr>
                 <th>번호</th>
@@ -62,7 +66,7 @@
                 <label for="keywordInput" style="display: none;">검색</label>
                 <input type="text" name="keyword" id="keywordInput" class="form-control"/>
                 <span class="input-group-btn">
-                    <button id="searchBtn" type="button" class="btn btn-default">검색</button>
+                    <button type="submit" class="btn btn-default">검색</button>
                 </span>
             </div>
         </div>

@@ -1,6 +1,7 @@
 package com.jpaboard.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.BoardFile;
 import com.jpaboard.entity.BoardVO;
 import com.jpaboard.entity.MpReply;
@@ -118,18 +119,18 @@ public class BoardController {
 
     //게시판 목록 뷰
     @GetMapping(value = "/boardList")
-    public String boardList(@RequestParam(value = "page", defaultValue = "0") int page,
-                            @RequestParam(value = "title", required = false, defaultValue = "") String title,
-                            @RequestParam(value = "writer", required = false, defaultValue = "") String writer,
-                            @RequestParam(value = "content", required = false, defaultValue = "") String content,
-                            @RequestParam(value = "fullSearch", required = false, defaultValue = "") String fullSearch,
+    public String boardList(@RequestParam(value = "page",
+                            defaultValue = "0") int page,
+                            SearchDto searchDto,
                             Model model) {
-        logger.info("boardList");
 
         // 내림차순 정렬을 위한 PageRequest 생성
-        Page<BoardVO> boardList =
-                boardService.boardList(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno"))); // "id" 기준 내림차순 정렬
+        logger.info("boardList - 검색 조건: {}", searchDto);
 
+        Page<BoardVO> boardList = boardService.boardList(
+                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno")),
+                searchDto
+        );
         int totalPages = boardList.getTotalPages();
         int startPage = Math.max(0, page - 5); // 현재 페이지 기준으로 앞 5페이지
         int endPage = Math.min(totalPages - 1, page + 4); // 현재 페이지 기준으로 뒤 4페이지
@@ -143,6 +144,7 @@ public class BoardController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        model.addAttribute("searchDto", searchDto);
 
         return "board/boardList";
     }
