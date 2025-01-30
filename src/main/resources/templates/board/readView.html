@@ -217,12 +217,21 @@
 
     <span>파일 목록</span>
     <div class="form-group fileList">
-        <th:block th:each="file, iterStat : ${file}" th:if="${file.delGb} == N">
-            <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|"
-               th:text="${file.orgFileName}"
-               th:data-delGb="${file.delGb}">
-            </a>
+        <th:block th:each="file, iterStat : ${file}" th:if="${file.delGb} == 'N'">
+            <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|" th:text="${file.orgFileName}"
+               th:data-delGb="${file.delGb}"></a>
             <span th:text="${file.fileSize} + 'kb'"></span><br>
+
+            <div class="file-preview">
+                <th:block
+                        th:if="${#strings.endsWith(file.orgFileName, '.jpg') || #strings.endsWith(file.orgFileName, '.png') || #strings.endsWith(file.orgFileName, '.jpeg')}">
+                    <img th:src="@{/boardFile/} + ${file.orgFileName}" alt="이미지 미리보기" class="preview-image"/>
+                </th:block>
+
+                <th:block th:if="${#strings.endsWith(file.orgFileName, '.pdf')}">
+                    <iframe th:src="@{/boardFile/} + ${file.savedFileName}" class="preview-pdf"></iframe>
+                </th:block>
+            </div>
         </th:block>
     </div>
 

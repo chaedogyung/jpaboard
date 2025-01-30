@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .loginPage("/members/login") // 사용자 지정 로그인 페이지
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/") // 로그인 성공 후 리다이렉트
+                        .usernameParameter("username") // 사용자 이메일 파라미터
                         .failureHandler(new CustomAuthenticationFailureHandler()) // 로그인 실패 핸들러
                 )
                 .oauth2Login(oauth2 -> oauth2
