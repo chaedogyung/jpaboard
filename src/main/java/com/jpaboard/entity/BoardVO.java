@@ -56,4 +56,9 @@ public class BoardVO {
     public void prePersist() {
         this.regDate = this.regDate == null ? LocalDateTime.now() : this.regDate;
     }
+
+    // 조회수 증가 메서드
+    public void increaseHit() {
+        this.hit++;
+    }
 }

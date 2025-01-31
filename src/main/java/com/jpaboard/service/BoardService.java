@@ -71,8 +71,11 @@ public class BoardService {
 
     // 상세 조회 메서드
     public BoardVO read(Long bno) {
-        return boardRepository.findById(bno)
+
+        BoardVO boardVO = boardRepository.findById(bno)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. bno: " + bno));
+        boardVO.increaseHit();
+        return boardVO;
     }
 
     public List<BoardFile> findFilesByBno(Long bno) {
@@ -119,7 +122,7 @@ public class BoardService {
 
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
-                try{
+                try {
                     //서버에 파일저장
                     String orgFileName = file.getOriginalFilename();
                     String storedFileName = UUID.randomUUID().toString();

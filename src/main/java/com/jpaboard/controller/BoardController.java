@@ -1,9 +1,11 @@
 package com.jpaboard.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jpaboard.config.oauth.PrincipalDetails;
 import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.BoardFile;
 import com.jpaboard.entity.BoardVO;
+import com.jpaboard.entity.Member;
 import com.jpaboard.entity.MpReply;
 import com.jpaboard.service.BoardFileService;
 import com.jpaboard.service.BoardService;
@@ -154,10 +156,15 @@ public class BoardController {
     public String readView(BoardVO boardVO, Model model) {
         logger.info("read");
 
-        List<BoardFile> attachedFiles = boardService.findFilesByBno(boardVO.getBno());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        PrincipalDetails principal = (PrincipalDetails) auth.getPrincipal();
+        Member member = principal.getMember();
+        String useremail = member.getUseremail();
 
+        List<BoardFile> attachedFiles = boardService.findFilesByBno(boardVO.getBno());
         model.addAttribute("file", attachedFiles);
         model.addAttribute("read", boardService.read(boardVO.getBno()));
+        model.addAttribute("useremail", useremail);
 
         return "board/readView";
     }

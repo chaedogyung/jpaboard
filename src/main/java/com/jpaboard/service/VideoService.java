@@ -4,6 +4,7 @@ import com.jpaboard.dto.VideoDetailDto;
 import com.jpaboard.entity.Member;
 import com.jpaboard.entity.VideoLikes;
 import com.jpaboard.repository.LikeRepository;
+import com.jpaboard.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final LikeRepository likeRepository;
+    private final MemberRepository memberRepository;
 
 
     private final String videoUploadDirectory = "E:/videoUploads"; // 동영상 파일 업로드 경로
@@ -86,13 +88,14 @@ public class VideoService {
         // VideoLikes 엔티티 생성
         VideoLikes like = new VideoLikes();
 
-        //관련된 Videos와 Member 엔티티를 설정
-        Videos videos = new Videos();
-        videos.setVideoId(videoId);
+        // 관련된 Videos 엔티티 조회
+        Videos videos = videoRepository.findById(videoId)
+                .orElseThrow(() -> new RuntimeException("Video not found"));
         like.setVideo(videos);
 
-        Member member = new Member();
-        member.setUserid(userId);
+        // 기존 Member 엔티티 조회
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
         like.setUserid(member);
 
         like.setLiked_at(LocalDateTime.now());

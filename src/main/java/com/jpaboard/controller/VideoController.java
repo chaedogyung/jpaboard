@@ -1,6 +1,8 @@
 package com.jpaboard.controller;
 
+import com.jpaboard.config.oauth.PrincipalDetails;
 import com.jpaboard.dto.VideoDetailDto;
+import com.jpaboard.entity.Member;
 import com.jpaboard.entity.VideoLikes;
 import com.jpaboard.entity.Videos;
 import com.jpaboard.service.VideoService;
@@ -157,9 +159,11 @@ public class VideoController {
     public ModelAndView getVideoDetail(@PathVariable Long video_id) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userId = auth.getName();
+        PrincipalDetails principal = (PrincipalDetails) auth.getPrincipal();
+        Member member = principal.getMember();
+        String userId = member.getUserid();
         // 동영상 ID로 정보를 조회
-        VideoDetailDto videoDetail = videoService.getVideoDetailWithLikeCount(video_id, userId);
+        VideoDetailDto videoDetail = videoService.getVideoDetailWithLikeCount(video_id, String.valueOf(userId));
 
         String filePath = videoDetail.getVideoUrl();
         int lastIndexOfBackslash = filePath.lastIndexOf("\\");
@@ -177,10 +181,10 @@ public class VideoController {
         return mv; // 반환할 뷰의 이름
     }
 
-    @PostMapping(value="/like")
+    @PostMapping(value = "/like")
     public ResponseEntity<Integer> addLike(@RequestParam("videoId") Long videoId,
-                                                            @RequestParam("userId") String userId) {
-        Integer success = videoService.addLike(videoId,userId);
+                                           @RequestParam("userId") String userId) {
+        Integer success = videoService.addLike(videoId, userId);
         return ResponseEntity.ok(success);
     }
 

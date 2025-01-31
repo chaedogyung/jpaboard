@@ -41,6 +41,7 @@
 
         //댓글 목록
         function startReplyList() {
+            var useremail = [[${useremail}]];
             $.ajax({
                 url: '/board/replyList',
                 type: 'GET',
@@ -51,6 +52,15 @@
                         $('.replyList').empty(); // 기존 댓글 목록 초기화
                         data.forEach(function (reply) {
                             $('#noContentMessage').hide();
+                            var buttons = '';
+                            if (reply.reWriter === useremail) {
+                                buttons = `
+                                <div class="reply-footer">
+                                    <button type="button" class="replyUpdateBtn btn btn-sm btn-warning">수정</button>
+                                    <button type="button" class="replyDeleteBtn btn btn-sm btn-danger" data-rno="${reply.reRno}">삭제</button>
+                                </div>`;
+                            }
+
                             $('.replyList').append(`
                        <li class="reply-item" data-rno="${reply.reRno}">
                             <div class="reply-card">
@@ -61,10 +71,7 @@
                                 <div class="reply-body">
                                     <p class="reply-text">${reply.reContent}</p>
                                 </div>
-                                <div class="reply-footer">
-                                    <button type="button" class="replyUpdateBtn btn btn-sm btn-warning">수정</button>
-                                    <button type="button" class="replyDeleteBtn btn btn-sm btn-danger" data-rno="${reply.reRno}">삭제</button>
-                                </div>
+                                ${buttons}
                             </div>
                         </li>
                     `);
@@ -104,13 +111,11 @@
             const replyRno = $li.data('rno');
 
             //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
-            $li.find('.replyEditInput').replaceWith(`
-            <p class="reply-text">${replyContent}</p>
-        `);
+            $li.find('.replyEditInput').replaceWith(`<p class="reply-text">${replyContent}</p>`);
             $li.find('.reply-footer').html(`
             <button type="button" class="replyUpdateBtn btn btn-warning">수정</button>
             <button type="button" class="replyDeleteBtn btn btn-danger" data-rno="${replyRno}">삭제</button>
-        `);
+            `);
         });
 
         // 댓글 수정 저장
@@ -161,6 +166,15 @@
                     // Optionally, show an error message
                 }
             });
+        });
+
+        // 엔터키 이벤트 처리
+        $(document).on('keydown', '#replyForm', function (event) {
+            // 엔터키의 키 코드는 13입니다.
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 폼의 기본 제출 동작 방지
+                $('.replyWriteBtn').click(); // 작성 버튼 클릭 이벤트 트리거
+            }
         });
 
         // 목록
@@ -249,13 +263,13 @@
         <p id="noContentMessage" style="display: none;" class="no-content-message">댓글이 없습니다.</p>
     </div>
 
-    <form class="form-horizontal">
+    <form class="form-horizontal" id="replyForm">
         <div id="replyWrite">
-
             <div class="form-group">
                 <label for="writer" class="col-sm-2 control-label">댓글 작성자</label>
                 <div class="col-sm-10">
-                    <input type="text" id="reWriter" name="reWriter" class="form-control"/>
+                    <input type="text" id="reWriter" name="reWriter" readonly th:value="${useremail}"
+                           class="form-control"/>
                 </div>
             </div>
 
