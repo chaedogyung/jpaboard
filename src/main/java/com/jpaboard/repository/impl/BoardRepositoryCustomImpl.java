@@ -1,8 +1,9 @@
-package com.jpaboard.repository;
+package com.jpaboard.repository.impl;
 
 import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.BoardVO;
 import com.jpaboard.entity.QBoardVO;
+import com.jpaboard.repository.custom.BoardRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,7 +13,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
+@Repository  // 명시적으로 Spring이 인식하도록 추가
 @RequiredArgsConstructor
 public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
     private final JPAQueryFactory queryFactory;
@@ -21,9 +24,8 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
     public Page<BoardVO> searchBoards(SearchDto searchDto, Pageable pageable) {
         QBoardVO board = QBoardVO.boardVO;
 
-        //동적 검색 조건 추가
+        // 동적 검색 조건 추가
         BooleanBuilder builder = new BooleanBuilder();
-
         if (searchDto.getTitle() != null && !searchDto.getTitle().isEmpty()) {
             builder.and(board.title.containsIgnoreCase(searchDto.getTitle()));
         }
@@ -41,22 +43,25 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
             );
         }
 
-        //쿼리 실행
+        // 쿼리 실행
         JPAQuery<BoardVO> query = queryFactory
                 .selectFrom(board)
                 .where(builder)
                 .orderBy(board.bno.desc());
-        //페이징 처리
+
+        // 페이징 처리
         List<BoardVO> results = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        //전체 데이터 개수 조회
-        long total = queryFactory.select(board.count())
+        // 전체 데이터 개수 조회
+        long total = queryFactory
+                .select(board.count())
                 .from(board)
                 .where(builder)
                 .fetchOne();
+
         return new PageImpl<>(results, pageable, total);
     }
 }

@@ -1,6 +1,7 @@
-package com.jpaboard.repository;
+package com.jpaboard.repository.impl;
 
 import com.jpaboard.entity.QVideoLikes;
+import com.jpaboard.repository.custom.LikeRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

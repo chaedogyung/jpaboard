@@ -49,7 +49,7 @@
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader(csrfHeader, csrfToken);
                     },
-                    success: function (data) {debugger
+                    success: function (data) {
                         if (data == 1) {
                             $(".like-button").val(data);
                             $(".like-button").css({

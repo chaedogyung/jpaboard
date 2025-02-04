@@ -1,14 +1,19 @@
-package com.jpaboard.repository;
+package com.jpaboard.repository.impl;
 
+import com.jpaboard.dto.SearchDto;
 import com.jpaboard.dto.VideoDetailDto;
 import com.jpaboard.entity.QVideoLikes;
 import com.jpaboard.entity.QVideos;
+import com.jpaboard.repository.custom.VideoRepositoryCustom;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -59,4 +64,21 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
                 .fetchOne();
     }
 
+    @Override
+    public List<Tuple> integratedSearch1(SearchDto search) {
+        QVideos video = QVideos.videos;
+        List<Tuple> results = queryFactory
+                .select(
+                        video.videoId,
+                        video.title,
+                        Expressions.stringTemplate("TO_CHAR({0})", video.description) // SQL 변환
+                )
+                .from(video)
+                .where(video.title.eq(search.getFullSearch())
+                        .or(video.description.eq(search.getFullSearch()))
+                )
+                .orderBy(video.videoId.desc()) // videoId 기준 내림차순 정렬
+                .fetch();
+        return results;
+    }
 }

@@ -1,7 +1,7 @@
 package com.jpaboard.repository;
 
 import com.jpaboard.entity.BoardVO;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.jpaboard.repository.custom.BoardRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
