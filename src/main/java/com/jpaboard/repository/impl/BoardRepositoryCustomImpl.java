@@ -3,7 +3,7 @@ package com.jpaboard.repository.impl;
 import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.BoardVO;
 import com.jpaboard.entity.QBoardVO;
-import com.jpaboard.repository.custom.BoardRepositoryCustom;
+import com.jpaboard.repository.BoardRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import org.springframework.stereotype.Repository;
 
-@Repository  // 명시적으로 Spring이 인식하도록 추가
 @RequiredArgsConstructor
 public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
     private final JPAQueryFactory queryFactory;

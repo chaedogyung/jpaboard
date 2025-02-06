@@ -1,4 +1,4 @@
-package com.jpaboard.repository.custom;
+package com.jpaboard.repository;
 
 import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.BoardVO;

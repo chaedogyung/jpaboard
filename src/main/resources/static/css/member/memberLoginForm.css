@@ -1,0 +1,9 @@
+ .error {
+     color: #bd2130;
+ }
+ .google-login-btn img {
+     width: 200px; /* 버튼 크기 조정 */
+     height: auto;
+     display: block;
+     margin-top: 10px;
+ }

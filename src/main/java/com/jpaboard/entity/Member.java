@@ -1,10 +1,8 @@
 package com.jpaboard.entity;
 
 import com.jpaboard.constant.Role;
-import com.jpaboard.dto.MemberFormDto;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 

@@ -4,7 +4,7 @@ import com.jpaboard.dto.SearchDto;
 import com.jpaboard.dto.VideoDetailDto;
 import com.jpaboard.entity.QVideoLikes;
 import com.jpaboard.entity.QVideos;
-import com.jpaboard.repository.custom.VideoRepositoryCustom;
+import com.jpaboard.repository.VideoRepositoryCustom;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -74,8 +74,8 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
                         Expressions.stringTemplate("TO_CHAR({0})", video.description) // SQL 변환
                 )
                 .from(video)
-                .where(video.title.eq(search.getFullSearch())
-                        .or(video.description.eq(search.getFullSearch()))
+                .where(video.title.likeIgnoreCase("%"+search.getFullSearch()+"%")
+                        .or(video.description.likeIgnoreCase("%"+search.getFullSearch()+"%"))
                 )
                 .orderBy(video.videoId.desc()) // videoId 기준 내림차순 정렬
                 .fetch();

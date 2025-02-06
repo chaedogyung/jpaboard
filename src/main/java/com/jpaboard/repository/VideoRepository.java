@@ -1,7 +1,6 @@
 package com.jpaboard.repository;
 
 import com.jpaboard.entity.Videos;
-import com.jpaboard.repository.custom.VideoRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VideoRepository extends JpaRepository<Videos, Long>, VideoRepositoryCustom {
