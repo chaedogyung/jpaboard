@@ -6,62 +6,61 @@
     <title>게시판</title>
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/board/readView.css}">
-</head>
-<th:block layout:fragment="script">
-    <script th:inline="javascript">
-        $(document).ready(function () {
-            startReplyList();
-            // 댓글 작성
-            $('.replyWriteBtn').on('click', function () {
-                var bno = $('#bno').val();
-                var reWriter = $('#reWriter').val();
-                var reContent = $('#reContent').val();
-                var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
-                $.ajax({
-                    url: '/board/replyWrite', // Ensure the URL starts from the root
-                    type: 'post',
-                    data: {
-                        bno,
-                        reWriter,
-                        reContent
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
-                    },
-                    success: function () {
-                        startReplyList();
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error occurred while fetching replies: ", error);
-                        // Optionally, show an error message
-                    }
-                });
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                startReplyList();
+                // 댓글 작성
+                $('.replyWriteBtn').on('click', function () {
+                    var bno = $('#bno').val();
+                    var reWriter = $('#reWriter').val();
+                    var reContent = $('#reContent').val();
+                    var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
+                    $.ajax({
+                        url: '/board/replyWrite', // Ensure the URL starts from the root
+                        type: 'post',
+                        data: {
+                            bno,
+                            reWriter,
+                            reContent
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
+                        },
+                        success: function () {
+                            startReplyList();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error occurred while fetching replies: ", error);
+                            // Optionally, show an error message
+                        }
+                    });
+                })
             })
-        })
 
-        //댓글 목록
-        function startReplyList() {
-            var useremail = [[${useremail}]];
-            $.ajax({
-                url: '/board/replyList',
-                type: 'GET',
-                data: {bno: $('#bno').val()},
-                success: function (data) {
-                    if (data && data.length > 0) {
-                        // 댓글 목록이 있는 경우
-                        $('.replyList').empty(); // 기존 댓글 목록 초기화
-                        data.forEach(function (reply) {
+            //댓글 목록
+            function startReplyList() {
+                var useremail = [[${useremail}]];
+                $.ajax({
+                    url: '/board/replyList',
+                    type: 'GET',
+                    data: {bno: $('#bno').val()},
+                    success: function (data) {
+                        if (data && data.length > 0) {
+                            // 댓글 목록이 있는 경우
+                            $('.replyList').empty(); // 기존 댓글 목록 초기화
                             $('#noContentMessage').hide();
-                            var buttons = '';
-                            if (reply.reWriter === useremail) {
-                                buttons = `
+
+                            data.forEach(function (reply) {
+                                var buttons = '';
+                                if (reply.reWriter === useremail) {
+                                    buttons = `
                                 <div class="reply-footer">
                                     <button type="button" class="replyUpdateBtn btn btn-sm btn-warning">수정</button>
                                     <button type="button" class="replyDeleteBtn btn btn-sm btn-danger" data-rno="${reply.reRno}">삭제</button>
                                 </div>`;
-                            }
-
-                            $('.replyList').append(`
+                                }
+                                $('.replyList').append(`
                        <li class="reply-item" data-rno="${reply.reRno}">
                             <div class="reply-card">
                                 <div class="reply-header">
@@ -72,134 +71,187 @@
                                     <p class="reply-text">${reply.reContent}</p>
                                 </div>
                                 ${buttons}
+                                <button type="button" class="replyReplyBtn btn btn-sm btn-primary">답글</button>
+                                <div class="reply-reply-section" style="display:none;"></div>
                             </div>
                         </li>
                     `);
-                        });
-                    } else {
-                        // 댓글이 없는 경우
-                        $('.replyList').empty();
-                        $('#noContentMessage').show();
+                            });
+                        } else {
+                            // 댓글이 없는 경우
+                            $('.replyList').empty();
+                            $('#noContentMessage').show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred while fetching replies: ", error);
+                        // Optionally, show an error message
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error occurred while fetching replies: ", error);
-                    // Optionally, show an error message
+                });
+            }
+
+            //답글 버튼
+            $(document).on('click', '.replyReplyBtn', function () {
+                var $replySection = $(this).siblings('.reply-reply-section');
+                var useremail = [[${useremail}]];
+                if ($replySection.is(':empty')) {
+                    $replySection.html(`
+                    <div class="reply-reply-form">
+                        <input type="hidden" class="replyParentRno" name="parent_re_rno" value="${$(this).closest('li').data('rno')}">
+                        <input type="text" class="replyReplyWriter" name="re_writer" value="${useremail}" readonly />
+                        <input type="text" class="replyReplyContent" name="re_content" placeholder="답글 내용을 입력하세요" />
+                        <button type="button" class="replyReplySaveBtn btn btn-success">저장</button>
+                        <button type="button" class="replyReplyCancelBtn btn btn-danger">취소</button>
+                    </div>
+                `);
+                    $replySection.show();
                 }
             });
-        }
 
-        // 댓글 수정
-        $(document).on('click', '.replyUpdateBtn', function () {
-            const $li = $(this).closest('li');
-            const replyContent = $li.find('.reply-text').text();
-            const replyRno = $li.data('rno');
-            //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
-            $li.find('.reply-text').replaceWith(`
+            $(document).on('click', '.replyReplyCancelBtn', function () {
+                $(this).closest('.reply-reply-section').hide().empty();
+            });
+
+            //댓글에 대한 답글 저장 및 댓글에 대한 답글 목록 출력
+            $(document).on('click', '.replyReplySaveBtn', function () {
+                var $replySection = $(this).closest('.reply-reply-section');
+                var parentReRno = $replySection.find('.replyParentRno').val();
+                var reWriter = $replySection.find('.replyReplyWriter').val();
+                var reContent = $replySection.find('.replyReplyContent').val();
+                var bno = $('#bno').val();
+
+                var csrfToken = $("input[name='_csrf']").val();
+
+                $.ajax({
+                    url: '/board/replyReplyWrite',
+                    type: 'post',
+                    data: {parentReRno, reWriter, reContent, bno},
+                    headers: {'X-CSRF-TOKEN': csrfToken},
+                    success: function (data) {
+                        debugger
+                        console.log(data);
+                        for (var i = 0; i <= data.length; i++) {
+
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("답글 작성 오류: ", error);
+                    }
+                });
+            });
+
+
+            // 댓글 수정
+            $(document).on('click', '.replyUpdateBtn', function () {
+                const $li = $(this).closest('li');
+                const replyContent = $li.find('.reply-text').text();
+                const replyRno = $li.data('rno');
+                //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
+                $li.find('.reply-text').replaceWith(`
             <input type="text" class="replyEditInput" value="${replyContent}" />
         `);
-            $li.find('.reply-footer').html(`
+                $li.find('.reply-footer').html(`
             <button type="button" class="replySaveBtn btn btn-warning" data-rno="${replyRno}">저장</button>
             <button type="button" class="replyCancelBtn btn btn-danger">취소</button>
         `);
-        });
+            });
 
-        //수정 취소
-        $(document).on('click', '.replyCancelBtn', function () {
-            const $li = $(this).closest('li');
-            const replyContent = $li.find('.replyEditInput').val();
-            const replyRno = $li.data('rno');
+            //수정 취소
+            $(document).on('click', '.replyCancelBtn', function () {
+                const $li = $(this).closest('li');
+                const replyContent = $li.find('.replyEditInput').val();
+                const replyRno = $li.data('rno');
 
-            //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
-            $li.find('.replyEditInput').replaceWith(`<p class="reply-text">${replyContent}</p>`);
-            $li.find('.reply-footer').html(`
+                //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
+                $li.find('.replyEditInput').replaceWith(`<p class="reply-text">${replyContent}</p>`);
+                $li.find('.reply-footer').html(`
             <button type="button" class="replyUpdateBtn btn btn-warning">수정</button>
             <button type="button" class="replyDeleteBtn btn btn-danger" data-rno="${replyRno}">삭제</button>
             `);
-        });
+            });
 
-        // 댓글 수정 저장
-        $(document).on('click', '.replySaveBtn', function () {
-            const $li = $(this).closest('li');
-            const replyRno = $(this).data('rno');
-            const updatedContent = $li.find('.replyEditInput').val();
-            var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
-            $.ajax({
-                url: '/board/replyUpdate', // Your endpoint for updating
-                type: 'post',
-                data: {
-                    reRno: replyRno,
-                    reContent: updatedContent
-                },
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
-                },
-                success: function () {
-                    startReplyList(); // 댓글 목록을 다시 조회하여 업데이트
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 수정 중 오류 발생: ", error);
-                    alert("댓글 수정에 실패했습니다.");
+            // 댓글 수정 저장
+            $(document).on('click', '.replySaveBtn', function () {
+                const $li = $(this).closest('li');
+                const replyRno = $(this).data('rno');
+                const updatedContent = $li.find('.replyEditInput').val();
+                var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
+                $.ajax({
+                    url: '/board/replyUpdate', // Your endpoint for updating
+                    type: 'post',
+                    data: {
+                        reRno: replyRno,
+                        reContent: updatedContent
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
+                    },
+                    success: function () {
+                        startReplyList(); // 댓글 목록을 다시 조회하여 업데이트
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("댓글 수정 중 오류 발생: ", error);
+                        alert("댓글 수정에 실패했습니다.");
+                    }
+                });
+            });
+
+            // 댓글 삭제
+            $(document).on('click', '.replyDeleteBtn', function () {
+                const $li = $(this).closest('li');
+                const replyRno = $li.data('rno');
+                var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
+                $.ajax({
+                    url: '/board/replyDelete', // Your endpoint for updating
+                    type: 'delete',
+                    data: {
+                        reRno: replyRno
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
+                    },
+                    success: function () {
+                        startReplyList(); // 댓글 목록을 다시 조회하여 업데이트
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred while updating reply: ", error);
+                        // Optionally, show an error message
+                    }
+                });
+            });
+
+            // 엔터키 이벤트 처리
+            $(document).on('keydown', '#replyForm', function (event) {
+                // 엔터키의 키 코드는 13입니다.
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // 폼의 기본 제출 동작 방지
+                    $('.replyWriteBtn').click(); // 작성 버튼 클릭 이벤트 트리거
                 }
             });
-        });
 
-        // 댓글 삭제
-        $(document).on('click', '.replyDeleteBtn', function () {
-            const $li = $(this).closest('li');
-            const replyRno = $li.data('rno');
-            var csrfToken = $("input[name='_csrf']").val();  // Get CSRF token
-            $.ajax({
-                url: '/board/replyDelete', // Your endpoint for updating
-                type: 'delete',
-                data: {
-                    reRno: replyRno
-                },
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken  // Include CSRF token in the header
-                },
-                success: function () {
-                    startReplyList(); // 댓글 목록을 다시 조회하여 업데이트
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error occurred while updating reply: ", error);
-                    // Optionally, show an error message
-                }
+            // 목록
+            $(document).on('click', '.list_btn', function () {
+                // $(".list_btn").on("click", function () {
+                location.href = "/board/boardList";
+                // });
             });
-        });
 
-        // 엔터키 이벤트 처리
-        $(document).on('keydown', '#replyForm', function (event) {
-            // 엔터키의 키 코드는 13입니다.
-            if (event.key === 'Enter') {
-                event.preventDefault(); // 폼의 기본 제출 동작 방지
-                $('.replyWriteBtn').click(); // 작성 버튼 클릭 이벤트 트리거
+            function fn_fileDown(fileNo) {
+                var formObj = $("form[name='readForm']");
+                $("#fileNo").attr("th:value", fileNo);
+                formObj.attr("action", "/board/fileDown");
+                formObj.attr("method", "get");
+                formObj.submit();
             }
-        });
 
-        // 목록
-        $(document).on('click', '.list_btn', function () {
-            // $(".list_btn").on("click", function () {
-            location.href = "/board/boardList";
-            // });
-        });
-
-        function fn_fileDown(fileNo) {
-            var formObj = $("form[name='readForm']");
-            $("#fileNo").attr("th:value", fileNo);
-            formObj.attr("action", "/board/fileDown");
-            formObj.attr("method", "get");
-            formObj.submit();
-        }
-
-        $(document).on('click', '.update_btn', function () {
-            location.href = "/board/boardUpdateView?bno=" + $(this).data('bno');
-        });
-    </script>
-</th:block>
+            $(document).on('click', '.update_btn', function () {
+                location.href = "/board/boardUpdateView?bno=" + $(this).data('bno');
+            });
+        </script>
+    </th:block>
+</head>
 <body>
 <div layout:fragment="content" id="root">
-
     <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
     <header>
         <h1>게시판</h1>
