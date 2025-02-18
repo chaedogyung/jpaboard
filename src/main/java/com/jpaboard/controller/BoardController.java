@@ -1,7 +1,7 @@
 package com.jpaboard.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jpaboard.config.oauth.PrincipalDetails;
+import com.jpaboard.dto.MpReplyDto;
 import com.jpaboard.dto.SearchDto;
 import com.jpaboard.entity.BoardFile;
 import com.jpaboard.entity.BoardVO;
@@ -47,7 +47,12 @@ public class BoardController {
     @GetMapping(value = "/testView")
     public String testView() {
         logger.info("testView");
-        return "board/testView";
+        return "testfragments/left-sidebar";
+    }
+
+    @GetMapping(value = "/layout")
+    public String layout() {
+        return "testLayouts/layout1";
     }
 
     //게시판 글쓰기 뷰
@@ -228,6 +233,21 @@ public class BoardController {
             logger.error("Error while writing reply: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create reply.");
         }
+    }
+
+    //댓글에 대한 답글 작성
+    @PostMapping(value="/replyReplyWrite")
+    public ResponseEntity<List<MpReply>> replyReplyWrite(MpReplyDto mpReplyDto){
+
+        logger.info("replyReplyWrite");
+        try{
+            ResponseEntity<List<MpReply>> mpReplyList = replyService.replyReplyWrite(mpReplyDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(mpReplyList.getBody());
+        } catch(Exception e){
+            logger.error("Error while writing reply: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
     //첨부파일 다운로드

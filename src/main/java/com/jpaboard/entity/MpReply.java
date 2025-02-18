@@ -31,6 +31,9 @@ public class MpReply {
     @Column(name = "RE_WRITER", nullable = false, length = 50)
     private String reWriter;
 
+    @Column(name = "PARENT_RE_RNO", length = 50)
+    private Long parentReRno;
+
     @Column(name = "RE_REGDATE", updatable = false)
     private LocalDateTime reRegDate;
 

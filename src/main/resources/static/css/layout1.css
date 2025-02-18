@@ -14,6 +14,29 @@ html {
     margin-left: -200px;
 }
 
+.header .center-section {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.header .center-section input {
+    width: 50%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 20px 0 0 20px;
+    outline: none;
+}
+
+.header .center-section button {
+    padding: 8px 15px;
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+}
+
 .content {
     width: 100%; /* 화면 너비의 60%를 차지하도록 설정 */
     padding: 20px;

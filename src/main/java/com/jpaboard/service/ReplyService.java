@@ -1,11 +1,13 @@
 package com.jpaboard.service;
 
+import com.jpaboard.dto.MpReplyDto;
 import com.jpaboard.entity.BoardVO;
 import com.jpaboard.entity.MpReply;
 import com.jpaboard.repository.BoardRepository;
 import com.jpaboard.repository.ReplyRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -41,5 +43,22 @@ public class ReplyService {
 
     public void deleteReply(Long reRno) {
         replyRepository.deleteById(reRno);
+    }
+
+    public ResponseEntity<List<MpReply>> replyReplyWrite(MpReplyDto mpReplyDto) {
+
+        MpReply reply = new MpReply();
+        reply.setReRno(mpReplyDto.getReRno());
+        reply.setReWriter(mpReplyDto.getReWriter());
+        reply.setReContent(mpReplyDto.getReContent());
+        reply.setParentReRno(mpReplyDto.getParentReRno());
+        BoardVO boardVO = boardRepository.findByBno(mpReplyDto.getBno()); //
+        reply.setBoardVO(boardVO);
+        replyRepository.save(reply);
+
+        // 수정된 부분: ResponseEntity<Tuple> → List<MpReply>
+        List<MpReply> replies = replyRepository.findByReRnoOrderByReRegDateDesc(reply.getReRno());
+
+        return ResponseEntity.ok(replies);
     }
 }

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<div th:fragment="leftSidebar">
+    <div id="navbar">
+        <ul class="nav-ul">
+            <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
+                <a href="/">홈</a>
+            </li>
+            <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
+                <a href="/user/video/history">시청 기록</a>
+            </li>
+            <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
+                <a href="/user/video/favoriteVideo">좋아요</a>
+            </li>
+            <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
+                <a href="/user/customer/center">고객센터</a>
+            </li>
+        </ul>
+    </div>
+</div>
+</html>

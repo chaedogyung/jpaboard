@@ -6,23 +6,24 @@
     <title>게시판</title>
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/board/boardList.css}">
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            $(document).ready(function() {
+                //셀렉트 태그 값이 변경될 때마다 실행
+                $('select[name="searchType"]').on('change', function() {
+                    var selectedValue = $(this).val();//선택된 value 값을 가져옴
+                    $('#keywordInput').attr('name', selectedValue);//인풋태그의 네임 속성 변경
+                })
+
+                $('select[name="searchType"] option[value="fullSearch"]').prop('selected', true);
+                $('#keywordInput').attr('name', "fullSearch");//인풋태그의 네임 속성 변경
+
+            })
+
+        </script>
+    </th:block>
 </head>
-<th:block layout:fragment="script">
-    <script th:inline="javascript">
-    $(document).ready(function() {
-        //셀렉트 태그 값이 변경될 때마다 실행
-        $('select[name="searchType"]').on('change', function() {
-            var selectedValue = $(this).val();//선택된 value 값을 가져옴
-            $('#keywordInput').attr('name', selectedValue);//인풋태그의 네임 속성 변경
-        })
 
-        $('select[name="searchType"] option[value="fullSearch"]').prop('selected', true);
-        $('#keywordInput').attr('name', "fullSearch");//인풋태그의 네임 속성 변경
-
-    })
-
-    </script>
-</th:block>
 <body>
 <div layout:fragment="content" id="root">
     <h4>게시판</h4>

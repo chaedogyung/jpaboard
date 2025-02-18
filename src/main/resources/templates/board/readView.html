@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout1}">
 <head>
     <meta charset="UTF-8">
@@ -38,7 +39,7 @@
                 })
             })
 
-            //댓글 목록
+            // 댓글 목록 불러오기 (답글 포함)
             function startReplyList() {
                 var useremail = [[${useremail}]];
                 $.ajax({
@@ -47,36 +48,75 @@
                     data: {bno: $('#bno').val()},
                     success: function (data) {
                         if (data && data.length > 0) {
-                            // 댓글 목록이 있는 경우
                             $('.replyList').empty(); // 기존 댓글 목록 초기화
                             $('#noContentMessage').hide();
 
+                            var replyMap = {}; // 부모 댓글 기준으로 답글을 그룹화
                             data.forEach(function (reply) {
-                                var buttons = '';
-                                if (reply.reWriter === useremail) {
-                                    buttons = `
-                                <div class="reply-footer">
-                                    <button type="button" class="replyUpdateBtn btn btn-sm btn-warning">수정</button>
-                                    <button type="button" class="replyDeleteBtn btn btn-sm btn-danger" data-rno="${reply.reRno}">삭제</button>
-                                </div>`;
+                                if (reply.parentReRno != null) {
+                                    if (!replyMap[reply.parentReRno]) {
+                                        replyMap[reply.parentReRno] = [];
+                                    }
+                                    replyMap[reply.parentReRno].push(reply);
                                 }
-                                $('.replyList').append(`
-                       <li class="reply-item" data-rno="${reply.reRno}">
-                            <div class="reply-card">
-                                <div class="reply-header">
-                                    <div class="reply-writer">작성자: <strong>${reply.reWriter}</strong></div>
-                                    <div class="reply-date">${new Date(reply.reRegDate).toLocaleDateString()}</div>
-                                </div>
-                                <div class="reply-body">
-                                    <p class="reply-text">${reply.reContent}</p>
-                                </div>
-                                ${buttons}
-                                <button type="button" class="replyReplyBtn btn btn-sm btn-primary">답글</button>
-                                <div class="reply-reply-section" style="display:none;"></div>
-                            </div>
-                        </li>
-                    `);
                             });
+
+                            // 최상위 댓글 목록 생성
+                            data.forEach(function (reply) {
+                                if (reply.parentReRno == null || reply.parentReRno === '') {
+                                    var buttons = '';
+                                    if (reply.reWriter === useremail) {
+                                        buttons = `
+                                            <div class="reply-footer">
+                                                <button type="button" class="replyUpdateBtn btn btn-sm btn-warning">수정</button>
+                                                <button type="button" class="replyDeleteBtn btn btn-sm btn-danger" data-rno="${reply.reRno}">삭제</button>
+                                            </div>`;
+                                    }
+
+                                    var replyItem = $(`
+                                        <li class="reply-item" data-rno="${reply.reRno}">
+                                            <div class="reply-card">
+                                                <div class="reply-header">
+                                                    <div class="reply-writer">작성자: <strong>${reply.reWriter}</strong></div>
+                                                    <div class="reply-date">${new Date(reply.reRegDate).toLocaleDateString()}</div>
+                                                </div>
+                                                <div class="reply-body">
+                                                    <p class="reply-text top">${reply.reContent}</p>
+                                                </div>
+                                                ${buttons}
+                                                <button type="button" class="replyReplyBtn btn btn-sm btn-primary">답글</button>
+                                                <button type="button" class="replyReplyShow btn btn-sm btn-primary">답글 보이기</button>
+                                                <div class="reply-reply-section" style="display:none;"></div>
+                                            </div>
+                                            <ol class="replyReplyList"></ol> <!-- 답글 목록을 담을 요소 -->
+                                        </li>
+                                    `);
+
+                                    $('.replyList').append(replyItem);
+
+                                    // 해당 댓글의 답글 목록 추가
+                                    if (replyMap[reply.reRno]) {
+                                        replyMap[reply.reRno].forEach(function (childReply) {
+                                            var childItem = $(`
+                                                <li class="replyReply" style="margin-left: 20px; padding: 5px 10px; border-left: 3px solid #ccc;">
+                                                    <div class="reply-card" style="background: #f9f9f9; padding: 10px; border-radius: 5px;">
+                                                        <div class="reply-header">
+                                                            <strong>${childReply.reWriter}</strong>
+                                                            <small style="color: gray;">${new Date(childReply.reRegDate).toLocaleDateString()}</small>
+                                                        </div>
+                                                        <div class="reply-body">
+                                                            <p class="reply-text">${childReply.reContent}</p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            `);
+                                            replyItem.find(".replyReplyList").append(childItem);
+                                        });
+                                    }
+                                }
+                            });
+                            $('.replyReplyList').hide();
+
                         } else {
                             // 댓글이 없는 경우
                             $('.replyList').empty();
@@ -85,41 +125,48 @@
                     },
                     error: function (xhr, status, error) {
                         console.error("Error occurred while fetching replies: ", error);
-                        // Optionally, show an error message
                     }
                 });
             }
 
+            //답글 보이기
+            $(document).on('click', '.replyReplyShow', function () {
+                $(this).closest('.reply-item').find('.replyReplyList').show();
+            });
+
             //답글 버튼
             $(document).on('click', '.replyReplyBtn', function () {
                 var $replySection = $(this).siblings('.reply-reply-section');
+                var parentReRno = $(this).closest('li').data('rno');
                 var useremail = [[${useremail}]];
+
                 if ($replySection.is(':empty')) {
                     $replySection.html(`
-                    <div class="reply-reply-form">
-                        <input type="hidden" class="replyParentRno" name="parent_re_rno" value="${$(this).closest('li').data('rno')}">
-                        <input type="text" class="replyReplyWriter" name="re_writer" value="${useremail}" readonly />
-                        <input type="text" class="replyReplyContent" name="re_content" placeholder="답글 내용을 입력하세요" />
-                        <button type="button" class="replyReplySaveBtn btn btn-success">저장</button>
-                        <button type="button" class="replyReplyCancelBtn btn btn-danger">취소</button>
-                    </div>
-                `);
+                        <div class="reply-reply-form">
+                            <input type="hidden" class="replyParentRno" name="parent_re_rno" value="${parentReRno}">
+                            <input type="text" class="replyReplyWriter" name="re_writer" value="${useremail}" readonly />
+                            <input type="text" class="replyReplyContent" name="re_content" placeholder="답글 내용을 입력하세요" />
+                            <button type="button" class="replyReplySaveBtn btn btn-success">저장</button>
+                            <button type="button" class="replyReplyCancelBtn btn btn-danger">취소</button>
+                        </div>
+                    `);
                     $replySection.show();
                 }
             });
 
+            //답글 취소
             $(document).on('click', '.replyReplyCancelBtn', function () {
                 $(this).closest('.reply-reply-section').hide().empty();
             });
 
             //댓글에 대한 답글 저장 및 댓글에 대한 답글 목록 출력
             $(document).on('click', '.replyReplySaveBtn', function () {
+                var dataReRno = $(this).closest('.reply-item').data('rno');
                 var $replySection = $(this).closest('.reply-reply-section');
                 var parentReRno = $replySection.find('.replyParentRno').val();
                 var reWriter = $replySection.find('.replyReplyWriter').val();
                 var reContent = $replySection.find('.replyReplyContent').val();
                 var bno = $('#bno').val();
-
                 var csrfToken = $("input[name='_csrf']").val();
 
                 $.ajax({
@@ -128,11 +175,41 @@
                     data: {parentReRno, reWriter, reContent, bno},
                     headers: {'X-CSRF-TOKEN': csrfToken},
                     success: function (data) {
-                        debugger
-                        console.log(data);
-                        for (var i = 0; i <= data.length; i++) {
+                        var groupedData = {};
+                        data.forEach(item => {
+                            if (!groupedData[item.parentReRno]) {
+                                groupedData[item.parentReRno] = [];
+                            }
+                            groupedData[item.parentReRno].push(item);
+                        });
 
-                        }
+                        $("li[data-rno='" + dataReRno + "']").each(function () {
+                            var parentValue = $(this).data('rno');
+                            var matchedItems = groupedData[parentValue];
+
+                            if (matchedItems) {
+                                var childContainer = $(".replyReplyList");
+
+                                matchedItems.forEach(item => {
+                                    var listItem = $(`
+                                    <li class="replyReply" style="margin-left: 20px; padding: 5px 10px; border-left: 3px solid #ccc;">
+                                        <div class="reply-card" style="background: #f9f9f9; padding: 10px; border-radius: 5px;">
+                                            <div class="reply-header">
+                                                <strong>${item.reWriter}</strong>
+                                                <small style="color: gray;">${item.reRegDate}</small>
+                                            </div>
+                                            <div class="reply-body">
+                                                <p class="reply-text">${item.reContent}</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    `);
+                                    childContainer.append(listItem);
+                                });
+
+                                // $(this).children(".reply-card").append(childContainer);
+                            }
+                        });
                     },
                     error: function (xhr, status, error) {
                         console.error("답글 작성 오류: ", error);
@@ -140,34 +217,36 @@
                 });
             });
 
-
             // 댓글 수정
             $(document).on('click', '.replyUpdateBtn', function () {
                 const $li = $(this).closest('li');
-                const replyContent = $li.find('.reply-text').text();
+                const replyContent = $li.find('.reply-text.top').text();
                 const replyRno = $li.data('rno');
                 //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
-                $li.find('.reply-text').replaceWith(`
-            <input type="text" class="replyEditInput" value="${replyContent}" />
-        `);
+                $li.find('.reply-text').hide();
+                $li.find('.reply-text').after(`
+                    <input type="text" class="replyEditInput" value="${replyContent}" />
+                `);
                 $li.find('.reply-footer').html(`
-            <button type="button" class="replySaveBtn btn btn-warning" data-rno="${replyRno}">저장</button>
-            <button type="button" class="replyCancelBtn btn btn-danger">취소</button>
-        `);
+                    <button type="button" class="replySaveBtn btn btn-warning" data-rno="${replyRno}">저장</button>
+                    <button type="button" class="replyCancelBtn btn btn-danger">취소</button>
+                `);
             });
 
-            //수정 취소
+            //댓글 수정 취소
             $(document).on('click', '.replyCancelBtn', function () {
                 const $li = $(this).closest('li');
                 const replyContent = $li.find('.replyEditInput').val();
                 const replyRno = $li.data('rno');
 
                 //댓글 내용을 입력할 수 있는 텍스트 박스와 저장/취소 버튼으로 변경
-                $li.find('.replyEditInput').replaceWith(`<p class="reply-text">${replyContent}</p>`);
+                $('.reply-text').show();
+                $('.replyEditInput').remove()
+                // $li.find('.replyEditInput').replaceWith(`<p class="reply-text">${replyContent}</p>`);
                 $li.find('.reply-footer').html(`
-            <button type="button" class="replyUpdateBtn btn btn-warning">수정</button>
-            <button type="button" class="replyDeleteBtn btn btn-danger" data-rno="${replyRno}">삭제</button>
-            `);
+                <button type="button" class="replyUpdateBtn btn btn-warning">수정</button>
+                <button type="button" class="replyDeleteBtn btn btn-danger" data-rno="${replyRno}">삭제</button>
+                `);
             });
 
             // 댓글 수정 저장
@@ -247,6 +326,7 @@
             $(document).on('click', '.update_btn', function () {
                 location.href = "/board/boardUpdateView?bno=" + $(this).data('bno');
             });
+
         </script>
     </th:block>
 </head>
@@ -281,26 +361,33 @@
         <span th:text="${regdate}"></span>
     </div>
 
-    <span>파일 목록</span>
-    <div class="form-group fileList">
-        <th:block th:each="file, iterStat : ${file}" th:if="${file.delGb} == 'N'">
-            <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|" th:text="${file.orgFileName}"
-               th:data-delGb="${file.delGb}"></a>
-            <span th:text="${file.fileSize} + 'kb'"></span><br>
-
-            <div class="file-preview">
-                <th:block
-                        th:if="${#strings.endsWith(file.orgFileName, '.jpg') || #strings.endsWith(file.orgFileName, '.png') || #strings.endsWith(file.orgFileName, '.jpeg')}">
-                    <img th:src="@{/boardFile/} + ${file.orgFileName}" alt="이미지 미리보기" class="preview-image"/>
+    <div class="file-list-container">
+        <h3>파일 목록</h3>
+        <th:block th:if="${not #lists.isEmpty(file)}">
+            <ul class="file-list">
+                <th:block th:each="file, iterStat : ${file}" th:if="${file.delGb} == 'N'">
+                    <li>
+                        <a href="#" th:onclick="|fn_fileDown(${file.fileNo}); return false;|"
+                           th:text="${file.orgFileName}"></a>
+                        <span th:text="${file.fileSize} + 'kb'"></span>
+                        <div class="file-preview">
+                            <th:block
+                                    th:if="${#strings.endsWith(file.orgFileName, '.jpg') || #strings.endsWith(file.orgFileName, '.png') || #strings.endsWith(file.orgFileName, '.jpeg')}">
+                                <img th:src="@{/boardFile/} + ${file.orgFileName}" alt="이미지 미리보기"
+                                     class="preview-image"/>
+                            </th:block>
+                            <th:block th:if="${#strings.endsWith(file.orgFileName, '.pdf')}">
+                                <iframe th:src="@{/boardFile/} + ${file.savedFileName}" class="preview-pdf"></iframe>
+                            </th:block>
+                        </div>
+                    </li>
                 </th:block>
-
-                <th:block th:if="${#strings.endsWith(file.orgFileName, '.pdf')}">
-                    <iframe th:src="@{/boardFile/} + ${file.savedFileName}" class="preview-pdf"></iframe>
-                </th:block>
-            </div>
+            </ul>
+        </th:block>
+        <th:block th:if="${#lists.isEmpty(file)}">
+            <p class="no-files-message">등록된 파일이 없습니다.</p>
         </th:block>
     </div>
-
 
     <div>
         <button type="submit" class="update_btn btn btn-warning" th:data-bno="${read.bno}">수정</button>

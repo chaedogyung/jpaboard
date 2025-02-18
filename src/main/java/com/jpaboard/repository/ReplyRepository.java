@@ -8,4 +8,6 @@ import java.util.List;
 public interface ReplyRepository extends JpaRepository<MpReply, Long> {
     // 특정 게시글에 대한 댓글 목록 조회
     List<MpReply> findByBoardVO_Bno(Long boardVOBno);
+
+    List<MpReply> findByReRnoOrderByReRegDateDesc(Long parentReRno);
 }
