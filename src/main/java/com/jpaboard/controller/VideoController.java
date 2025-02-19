@@ -2,12 +2,11 @@ package com.jpaboard.controller;
 
 import com.jpaboard.config.oauth.PrincipalDetails;
 import com.jpaboard.dto.VideoDetailDto;
+import com.jpaboard.entity.Genres;
 import com.jpaboard.entity.Member;
-import com.jpaboard.entity.VideoLikes;
 import com.jpaboard.entity.Videos;
 import com.jpaboard.service.VideoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,13 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -145,7 +142,6 @@ public class VideoController {
         return "";
     }
 
-
     //동영상 목록
     @GetMapping("/video/list")
     public ModelAndView getVideoList(/*Model model*/) {
@@ -181,6 +177,7 @@ public class VideoController {
         return mv; // 반환할 뷰의 이름
     }
 
+    //좋아요 추가
     @PostMapping(value = "/like")
     public ResponseEntity<Integer> addLike(@RequestParam("videoId") Long videoId,
                                            @RequestParam("userId") String userId) {
@@ -188,6 +185,7 @@ public class VideoController {
         return ResponseEntity.ok(success);
     }
 
+    //좋아요 취소
     @DeleteMapping("/cancelLike")
     public ResponseEntity<Integer> cancelLike(@RequestParam("videoId") Long videoId,
                                               @RequestParam("userId") String userId) {
@@ -195,12 +193,19 @@ public class VideoController {
         return ResponseEntity.ok(success);
     }
 
+    //좋아요 카운트
     @GetMapping("/likeCount")
     public ResponseEntity<Long> likeCount(Long videoId) {
         Long likeCount = videoService.getLikesCountByVideoId(videoId);
         return ResponseEntity.ok(likeCount);
     }
 
+    //장르 목록
+    @GetMapping("/genres")
+    public ResponseEntity<List<Genres>> genresList(){
+        ResponseEntity<List<Genres>> genres = videoService.genresList();
+        return genres;
+    }
 
     //동영상 관리 목록
     @GetMapping("/video/manage")

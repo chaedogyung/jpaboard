@@ -6,6 +6,29 @@
     <title>동영상 등록</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/video/videoForm.css}">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            genres();
+            function genres() {
+                $.ajax({
+                    url: '/user/genres', // 장르 목록을 가져오는 API
+                    type: 'GET',
+                    success: function (data) {
+                        let $genreSelect = $('#genre');
+                        $genreSelect.empty(); // 기존 옵션 제거
+                        $genreSelect.append('<option value="">-- 장르를 선택하세요 --</option>'); // 기본값 추가
+
+                        data.forEach(function (genre) {
+                            $genreSelect.append(`<option value="${genre.genrecode}">${genre.genrename}</option>`);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('장르 데이터를 로드하는 중 오류 발생:', error);
+                    }
+                });
+            }
+        });
+    </script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -84,29 +107,5 @@
         </form>
     </div>
 </div>
-
-<script>
-    $(document).ready(function () {
-        // Ajax 요청을 통해 genres 데이터를 가져옴
-        $.ajax({
-            url: '/api/genres', // 서버에서 genres 데이터를 제공하는 API 엔드포인트
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                // 성공적으로 데이터를 가져온 경우 <select> 태그에 옵션 추가
-                var genreSelect = $('#genre');
-                data.forEach(function (genre) {
-                    var option = $('<option></option>')
-                        .val(genre.genre_eng) // value 속성에 영어 장르명을 설정
-                        .text(genre.genre_kor + ' (' + genre.genre_eng + ')'); // 텍스트는 한국어와 영어로 표시
-                    genreSelect.append(option);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error('장르 데이터를 로드하는 중 오류 발생:', error);
-            }
-        });
-    });
-</script>
 </body>
 </html>

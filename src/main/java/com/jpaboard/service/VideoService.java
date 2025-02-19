@@ -1,12 +1,16 @@
 package com.jpaboard.service;
 
 import com.jpaboard.dto.VideoDetailDto;
+import com.jpaboard.entity.Genres;
 import com.jpaboard.entity.Member;
 import com.jpaboard.entity.VideoLikes;
+import com.jpaboard.repository.GenresRepository;
 import com.jpaboard.repository.LikeRepository;
 import com.jpaboard.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jpaboard.entity.Videos;
@@ -17,7 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 @Service
 @Transactional
@@ -27,6 +31,7 @@ public class VideoService {
     private final VideoRepository videoRepository;
     private final LikeRepository likeRepository;
     private final MemberRepository memberRepository;
+    private final GenresRepository genresRepository;
 
 
     private final String videoUploadDirectory = "E:/videoUploads"; // 동영상 파일 업로드 경로
@@ -116,5 +121,10 @@ public class VideoService {
     // 특정 비디오의 좋아요 수 가져오기
     public long getLikesCountByVideoId(Long videoId) {
         return likeRepository.countByVideo_VideoId(videoId);
+    }
+
+    public ResponseEntity<List<Genres>> genresList() {
+        ResponseEntity<List<Genres>> genres =new ResponseEntity<>(genresRepository.findAll(), HttpStatus.OK);
+        return genres;
     }
 }
