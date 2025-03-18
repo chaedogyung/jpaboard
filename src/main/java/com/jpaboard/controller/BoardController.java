@@ -47,12 +47,12 @@ public class BoardController {
     @GetMapping(value = "/testView")
     public String testView() {
         logger.info("testView");
-        return "testfragments/left-sidebar";
+        return "Ottfragments/left-sidebar";
     }
 
     @GetMapping(value = "/layout")
     public String layout() {
-        return "testLayouts/layout1";
+        return "OttLayouts/layout1";
     }
 
     //게시판 글쓰기 뷰
@@ -181,7 +181,6 @@ public class BoardController {
                                              @RequestParam String reContent) throws Exception {
         logger.info("replyWrite");
         try {
-
             replyService.saveReply(bno, reWriter, reContent);
             return ResponseEntity.status(HttpStatus.CREATED).body("Reply created successfully");
         } catch (Exception e) {

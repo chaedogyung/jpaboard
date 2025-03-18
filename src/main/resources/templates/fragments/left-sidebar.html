@@ -6,7 +6,7 @@
     <nav class="nav flex-column bg-light vh-100 p-3" style="width: 200px;">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a class="nav-link active" href="/">홈</a>
+                <a class="nav-link active" href="/user/video/list">홈</a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
                 <a class="nav-link active" href="/user/video/history">동영상 시청이력</a>

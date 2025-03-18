@@ -127,4 +127,9 @@ public class VideoService {
         ResponseEntity<List<Genres>> genres =new ResponseEntity<>(genresRepository.findAll(), HttpStatus.OK);
         return genres;
     }
+
+    public List<Videos> getVideoLikeList() {
+        List<Videos> videosList = likeRepository.getVideoLikeList();
+        return videosList;
+    }
 }

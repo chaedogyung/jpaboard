@@ -6,10 +6,10 @@
     <title th:text="${video.title}">동영상 상세</title>
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet">
-    <!-- Video.js JS -->
-    <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <link rel="stylesheet" th:href="@{/css/video/videoDetail.css}">
     <script>
         $(document).ready(function () {
@@ -74,7 +74,7 @@
         });
 
         function likeCount() {
-            const button =  $('.like-button');
+            const button = $('.like-button');
             const videoId = button.data('video-id');
             $.ajax({
                 url: '/user/likeCount',
@@ -89,60 +89,51 @@
             });
         }
 
-        // Video.js 초기화
-        var player = videojs('my-video', {
-            controls: true,
-            autoplay: true,
-            preload: 'auto',
-            playbackRates: [0.5, 1, 1.5, 2],
-            fluid: true
-        });
+        // Plyr 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            const player = new Plyr('#my-video', {
+                controls: [
+                    'play-large', // 큰 재생 버튼
+                    'play', // 재생/일시정지 버튼
+                    'progress', // 진행 바
+                    'current-time', // 현재 시간
+                    'mute', // 음소거
+                    'volume', // 볼륨 조절
+                    'captions', // 자막
+                    'settings', // 설정
+                    'pip', // Picture-in-Picture
+                    'airplay', // AirPlay
+                    'fullscreen' // 전체 화면
+                ],
+                autoplay: true,
+                keyboard: {focused: true, global: true},
+                tooltips: {controls: true, seek: true},
+                captions: {active: true, language: 'ko', update: true}
+            });
 
-        player.on('ended', function () {
-            alert('동영상이 종료되었습니다.');
-        });
+            player.on('ended', () => {
+                alert('동영상이 종료되었습니다.');
+            });
 
-        // 자막 기본 설정
-        player.ready(function () {
-            var tracks = player.textTracks(); // 자막 트랙 가져오기
-            for (var i = 0; i < tracks.length; i++) {
-                if (tracks[i].language === 'ko') {
-                    tracks[i].mode = 'showing'; // 자막 표시
+            // 화살표 키로 동영상 이동
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'ArrowRight') {
+                    // 오른쪽 화살표: 5초 앞으로
+                    player.currentTime += 5;
+                } else if (event.key === 'ArrowLeft') {
+                    // 왼쪽 화살표: 5초 뒤로
+                    player.currentTime -= 5;
                 }
-            }
+            });
         });
-
-        // 화살표 키로 동영상 이동
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'ArrowRight') {
-                // 오른쪽 화살표: 5초 앞으로
-                player.currentTime(player.currentTime() + 5);
-            } else if (event.key === 'ArrowLeft') {
-                // 왼쪽 화살표: 5초 뒤로
-                player.currentTime(player.currentTime() - 5);
-            }
-        });
-
     </script>
 </head>
 <body>
 <div layout:fragment="content" class="video-container">
     <!-- 동영상 플레이어 -->
-    <div class="video-container">
-        <!-- Video.js 플레이어 -->
-        <video
-                id="my-video"
-                class="video-js vjs-default-skin"
-                controls
-                preload="auto"
-                width="800"
-                height="450"
-                data-setup="{}"
-        >
-            <!-- 동영상 소스 -->
+    <div class="video-container" style="width: 100%; max-width: 1280px; margin: auto;">
+        <video id="my-video" controls style="width: 100%; height: auto;">
             <source th:src="@{/videoUploads/{encodeUrl}(encodeUrl=${encodeUrl})}" type="video/mp4">
-
-            <!-- 자막 (한국어) -->
             <track th:src="@{/videoUploads/{subtitlePath}(subtitlePath=${subtitlePath})}" kind="subtitles" srclang="ko"
                    label="한국어" id="sub" default/>
         </video>

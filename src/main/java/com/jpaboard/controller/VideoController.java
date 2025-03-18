@@ -231,4 +231,11 @@ public class VideoController {
     public String getVideoContact(Model model) {
         return "video/inquryVideo"; // 반환할 뷰의 이름
     }
+
+    //종아요 표시한 동영상 목록
+    @GetMapping("/video/LikeVideo")
+    public String getVideoLikeList(Model model) {
+       List<Videos> videoList = videoService.getVideoLikeList();
+        return "video/videoFavorite";
+    }
 }

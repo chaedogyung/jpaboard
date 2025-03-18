@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Draggable Navigation Bar</title>
+    <link th:href="@{/css/OttLayout.css}" type="text/css" rel="stylesheet">
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <script>
+        function toggleNavbar() {
+            const navbar = document.getElementById('navbar');
+            if (navbar.style.left === '0px') {
+                navbar.style.left = '-250px';
+            } else {
+                navbar.style.left = '0px';
+            }
+        }
+
+        $(document).ready(function () {
+            let isDragging = false;
+            let startX;
+
+            // 네비게이션 바 클릭 시 드래그 시작
+            $('#navbar').on('mousedown', function (e) {
+                isDragging = true;
+                startX = e.pageX; // 드래그 시작 지점
+                // 마우스 커서 스타일을 "grabbing"으로 변경
+                $('#navbar').css('cursor', 'grabbing');
+            });
+
+            // // 마우스를 움직일 때 네비게이션 바 이동
+            // $(document).on('mousemove', function (e) {
+            //     if (isDragging) {
+            //         const deltaX = e.pageX - startX;
+            //         const newLeft = Math.min(0, deltaX); // 너무 오른쪽으로 이동하지 않도록 제한
+            //
+            //         // 네비게이션 바가 마우스 움직임에 맞게 이동
+            //         $('#navbar').css('left', newLeft);
+            //
+            //         // 콘텐츠 영역도 네비게이션 바에 맞춰 이동
+            //         if (newLeft < 0) {
+            //             $('#content').css('margin-left', 250 + newLeft);
+            //         }
+            //     }
+            // });
+
+            // // 마우스를 떼면 드래그 종료
+            // $(document).on('mouseup', function () {
+            //     if (isDragging) {
+            //         const navbarLeft = parseInt($('#navbar').css('left'));
+            //
+            //         // 네비게이션 바가 일정 거리 이상 왼쪽으로 이동하면 숨기기
+            //         if (navbarLeft <= -250) {
+            //             $('#navbar').css('left', '-250px'); // 완전히 숨기기
+            //             $('#content').css('margin-left', '0'); // 콘텐츠도 원래 위치로
+            //         } else {
+            //             // 그렇지 않으면 원위치로 되돌리기
+            //             $('#navbar').css('left', '0');
+            //             $('#content').css('margin-left', '250px');
+            //         }
+            //     }
+            //     // 드래그 종료 상태
+            //     isDragging = false;
+            //     // 마우스 커서 스타일 복원
+            //     $('#navbar').css('cursor', 'pointer');
+            // });
+
+            // // 화면 다른 영역을 클릭하면 네비게이션 바가 사라짐
+            // $(document).on('click', function (e) {
+            //     if (!$(e.target).closest('#navbar').length) {
+            //         // 네비게이션 바 영역 외부를 클릭하면 네비게이션 바 숨기기
+            //         $('#navbar').css('left', '-213px'); // 완전히 화면 밖으로 이동
+            //         $('#content').css('margin-left', '0'); // 콘텐츠도 원위치로
+            //     }
+            // });
+
+            // 화면 왼쪽 끝에서 클릭하면 네비게이션 바 표시
+            $('#navbar').on('mousedown', function (e) {
+                if (e.pageX < 50 && $('#navbar').css('left') === '-213px') {
+                    $('#navbar').css('left', '0');
+                    $('#content').css('margin-left', '250px');
+                } else if (e.pageX > 50 && $('#navbar').css('left') === '0px') {
+                    $('#navbar').css('left', '-213px'); // 완전히 화면 밖으로 이동
+                    $('#content').css('margin-left', '0'); // 콘텐츠도 원위치로
+                }
+            });
+
+            $(document).ready(function () {
+                if ($('#navbar').css('left') === '-213px') {
+                    $('#navbar').css('left', '0');
+                    $('#content').css('margin-left', '250px');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<!-- 왼쪽 네비게이션 바 -->
+<div th:replace="~{Ottfragments/left-sidebar::leftSidebar}"></div>
+
+<!-- 메인 콘텐츠 영역 -->
+<div class="flex-grow-1">
+    <div th:replace="~{Ottfragments/header::header}"></div>
+    <div layout:fragment="content" id="content" style="margin-left: auto;padding-left: 72px;">
+    </div>
+    <div th:replace="~{Ottfragments/footer::footer}"></div>
+</div>
+</body>
+</html>
