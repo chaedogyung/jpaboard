@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout1}">
 <head>
     <title>동영상 리스트</title>
@@ -18,13 +19,161 @@
                 $('.video-grid').html(sortedVideos);
             });
         </script>
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                const track = document.getElementById('slideTrack');
+                const slides = track.children;
+                const dots = document.querySelectorAll('.dot');
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const slider = document.getElementById('customSlider');
+
+                let index = 0;
+                const slideCount = slides.length;
+                let interval;
+
+                function updateSlidePosition() {
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    dots.forEach(dot => dot.classList.remove('active'));
+                    if (dots[index]) {
+                        dots[index].classList.add('active');
+                    }
+                }
+
+                function showNextSlide() {
+                    index = (index + 1) % slideCount;
+                    updateSlidePosition();
+                }
+
+                function showPrevSlide() {
+                    index = (index - 1 + slideCount) % slideCount;
+                    updateSlidePosition();
+                }
+
+                function startAutoSlide() {
+                    interval = setInterval(showNextSlide, 3000);
+                }
+
+                function stopAutoSlide() {
+                    clearInterval(interval);
+                }
+
+                // 버튼 이벤트
+                nextBtn.addEventListener('click', showNextSlide);
+                prevBtn.addEventListener('click', showPrevSlide);
+
+                // dot 클릭 이벤트
+                dots.forEach((dot, dotIndex) => {
+                    dot.addEventListener('click', () => {
+                        index = dotIndex;
+                        updateSlidePosition();
+                    });
+                });
+
+                // hover 시 슬라이드 멈춤/재생
+                slider.addEventListener('mouseenter', stopAutoSlide);
+                slider.addEventListener('mouseleave', startAutoSlide);
+
+                // 초기 시작
+                updateSlidePosition();
+                startAutoSlide();
+            });
+        </script>
     </th:block>
+    <style>
+        .custom-slider {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .slide-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100%;
+        }
+
+        .wide-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 5;
+            object-fit: cover;
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .prev {
+            left: 10px;
+        }
+
+        .next {
+            right: 10px;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin: 0 5px;
+            background-color: #bbb;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: #717171;
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content">
     <header>
         <h1>등록된 동영상</h1>
     </header>
+
+
+    <!-- 슬라이드 배너 -->
+    <div class="custom-slider" id="customSlider">
+        <div class="slide-track" id="slideTrack">
+            <div class="slide" th:each="video, iterStat : ${videos}" th:data-index="${iterStat.index}">
+                <a th:href="@{{videoId}(videoId=${video.videoId})}">
+                    <img th:src="@{/images/{thumbnail_url}(thumbnail_url=${video.thumbnail_url})}"
+                         alt="썸네일" class="wide-image">
+                </a>
+            </div>
+        </div>
+
+        <!-- Prev / Next 버튼 -->
+        <button class="slider-button prev" id="prevBtn">&#10094;</button>
+        <button class="slider-button next" id="nextBtn">&#10095;</button>
+
+        <!-- Pagination Dots -->
+        <div class="slider-dots" id="sliderDots">
+            <span th:each="video, iterStat : ${videos}" class="dot"
+                  th:classappend="${iterStat.index == 0} ? ' active'"></span>
+        </div>
+    </div>
 
     <!-- videos가 null이거나 비어있을 때 문구 표시 -->
     <div th:if="${videos == null or videos.isEmpty()}" class="video-grid">
