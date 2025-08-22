@@ -12,13 +12,13 @@
                 <a href="/user/video/list">홈</a>
             </li>
             <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a href="/user/video/history">시청 기록</a>
+                <a href="/like/video/history">시청 기록</a>
             </li>
             <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a href="/user/video/favoriteVideo">좋아요</a>
+                <a href="/like/video/favoriteVideo">좋아요</a>
             </li>
             <li sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a href="/user/customer/center">고객센터</a>
+                <a href="/like/customer/center">고객센터</a>
             </li>
         </ul>
     </div>

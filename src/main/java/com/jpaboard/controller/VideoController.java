@@ -214,28 +214,4 @@ public class VideoController {
         return "video/videoManageList"; // 반환할 뷰의 이름
     }
 
-    //좋아요 동영상 목록
-    @GetMapping("/video/favoriteVideo")
-    public String getfavoriteVideoList(Model model) {
-        return "video/videoFavorite"; // 반환할 뷰의 이름
-    }
-
-    //동영상 시청이력
-    @GetMapping("/video/history")
-    public String getVideoHistory(Model model) {
-        return "video/videoHistory"; // 반환할 뷰의 이름
-    }
-
-    //고객센터
-    @GetMapping("/customer/center")
-    public String getVideoContact(Model model) {
-        return "video/inquryVideo"; // 반환할 뷰의 이름
-    }
-
-    //종아요 표시한 동영상 목록
-    @GetMapping("/video/LikeVideo")
-    public String getVideoLikeList(Model model) {
-       List<Videos> videoList = videoService.getVideoLikeList();
-        return "video/videoFavorite";
-    }
 }

@@ -9,13 +9,13 @@
                 <a class="nav-link active" href="/user/video/list">홈</a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a class="nav-link active" href="/user/video/history">동영상 시청이력</a>
+                <a class="nav-link active" href="/like/video/history">동영상 시청이력</a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a class="nav-link active" href="/user/video/favoriteVideo">좋아요 누른 동영상</a>
+                <a class="nav-link active" href="/like/video/favoriteVideo">좋아요 누른 동영상</a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')">
-                <a class="nav-link active" href="/user/customer/center">고객센터</a>
+                <a class="nav-link active" href="/like/customer/center">고객센터</a>
             </li>
 
         </ul>
