@@ -12,13 +12,12 @@ import java.util.Date;
 public class VideoDetailDto {
     private Long videoId;
     private String title;
-    private String videoUrl;
-    private String subtitleFilePath;
-    private Date releaseDate;   // 추가
-    private String ageRating;   // 추가
+    private String video_url;
+    private String subtitle_file_path;
+    private Date release_date;   // 추가
+    private String age_rating;   // 추가
     private String genre;       // 추가
     private String language;    // 추가
     private String description; // 추가
-    private Long likeCount;
-    private Integer isLikedByUser;
+    private Integer viewCount;
 }

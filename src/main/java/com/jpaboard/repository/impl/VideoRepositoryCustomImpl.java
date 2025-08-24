@@ -24,10 +24,9 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
     @Override
     public VideoDetailDto findVideoDetailWithLikeCount(Long videoId, String userId) {
         QVideos video = QVideos.videos;
-        QVideoLikes like = QVideoLikes.videoLikes;
 
         return queryFactory
-                .select(Projections.constructor(
+                .select(Projections.fields(
                         VideoDetailDto.class,
                         video.videoId,
                         video.title,
@@ -37,30 +36,11 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
                         video.age_rating,
                         video.genre,
                         video.language,
-                        Expressions.stringTemplate("TO_CHAR({0})", video.description), // SQL 변환
-                        like.like_id.count(),
-                        Expressions.cases().when(JPAExpressions.selectOne()
-                                        .from(like)
-                                        .where(like.video.videoId.eq(video.videoId)
-                                                .and(like.userid.userid.eq(userId)))
-                                        .exists())
-                                .then(1)
-                                .otherwise(0).as("isLikedByUser")
+                        video.viewCount,
+                        video.description
                 ))
                 .from(video)
-                .leftJoin(like).on(like.video.videoId.eq(video.videoId))
                 .where(video.videoId.eq(videoId))
-                .groupBy(
-                        video.videoId,
-                        video.title,
-                        video.video_url,
-                        video.subtitle_file_path,
-                        video.release_date,
-                        video.age_rating,
-                        video.genre,
-                        video.language,
-                        video.description
-                )
                 .fetchOne();
     }
 

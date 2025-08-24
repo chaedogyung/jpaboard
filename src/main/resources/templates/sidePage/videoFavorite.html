@@ -8,7 +8,8 @@
     <style>
         .video-list { display: flex; flex-direction: column; gap: 20px; padding: 20px; }
         .video-item { display: flex; gap: 15px; align-items: flex-start; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
-        .thumbnail { width: 200px; height: 120px; object-fit: cover; }
+        /*.thumbnail { width: 200px; height: 120px; object-fit: cover; }*/
+        .thumbnail {"height: 80px";}
         .video-info { flex: 1; }
         .video-title { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
         .meta { color: gray; font-size: 0.9em; margin-bottom: 5px; }
@@ -18,14 +19,14 @@
 <div layout:fragment="content">
     <h2>좋아요 표시한 동영상</h2>
     <div class="video-list">
-        <div th:each="video : ${videos}" class="video-item">
-            <img th:src="${video.thumbnailUrl}" alt="썸네일" class="thumbnail"/>
+        <div th:each="video : ${videoList}" class="video-item">
+            <img th:src="@{/images/{thumbnail_url}(thumbnail_url=${video.thumbnail_url})}" class="thumbnail" alt="썸네일" >
             <div class="video-info">
                 <div class="video-title" th:text="${video.title}">동영상 제목</div>
                 <div class="meta">
-                    <span th:text="${video.uploader}">업로더</span> ·
-                    <span th:text="${#temporals.format(video.uploadDate, 'yyyy.MM.dd')}">2025.07.30</span> ·
-                    <span th:text="'좋아요 ' + ${video.likes} + '개'">좋아요 123개</span>
+<!--                    <span th:text="${video.uploader}">업로더</span> ·-->
+                    <span th:text="${video.release_date}">2025.07.30</span> ·
+<!--                    <span th:text="'좋아요 ' + ${video.view_count} + '개'">좋아요 123개</span>-->
                 </div>
             </div>
         </div>

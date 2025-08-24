@@ -16,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
+
     private final JPAQueryFactory queryFactory;
 
     @Override

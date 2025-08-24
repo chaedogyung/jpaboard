@@ -161,11 +161,11 @@ public class VideoController {
         // 동영상 ID로 정보를 조회
         VideoDetailDto videoDetail = videoService.getVideoDetailWithLikeCount(video_id, String.valueOf(userId));
 
-        String filePath = videoDetail.getVideoUrl();
+        String filePath = videoDetail.getVideo_url();
         int lastIndexOfBackslash = filePath.lastIndexOf("\\");
         String fileName = filePath.substring(lastIndexOfBackslash + 1);
 
-        String subtitlePath = videoDetail.getSubtitleFilePath();
+        String subtitlePath = videoDetail.getSubtitle_file_path();
 
         // 조회된 비디오 정보를 뷰에 전달
         ModelAndView mv = new ModelAndView("video/videoDetail");

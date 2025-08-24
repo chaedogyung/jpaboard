@@ -141,8 +141,8 @@
     <div class="like-container">
         <!-- 값이 1일 때 보여지는 버튼 -->
         <button class="like-button"
-                th:if="${video.isLikedByUser == 1}"
-                th:value="${video.isLikedByUser}"
+                th:if="${video.viewCount == 1}"
+                th:value="${video.viewCount}"
                 th:data-video-id="${video.videoId}"
                 th:data-user-id="${userId}">
             Liked
@@ -150,14 +150,14 @@
 
         <!-- 값이 0일 때 보여지는 버튼 -->
         <button class="like-button"
-                th:if="${video.isLikedByUser == 0}"
-                th:value="${video.isLikedByUser}"
+                th:if="${video.viewCount == 0}"
+                th:value="${video.viewCount}"
                 th:data-video-id="${video.videoId}"
                 th:data-user-id="${userId}">
             Like
         </button>
         <!-- 좋아요 개수 출력 -->
-        <span id="likeCount" th:text="${video.likeCount}"></span>
+        <span id="likeCount" th:text="${video.viewCount}"></span>
     </div>
 
     <!-- 동영상 정보 -->
@@ -165,8 +165,8 @@
         <div class="video-title" th:text="${video.title}"></div>
         <div class="video-meta">
             장르: <span th:text="${video.genre}"></span><br>
-            출시일: <span th:text="${video.releaseDate}"></span><br>
-            연령 등급: <span th:text="${video.ageRating}"></span><br>
+            출시일: <span th:text="${video.release_date}"></span><br>
+            연령 등급: <span th:text="${video.age_rating}"></span><br>
             언어: <span th:text="${video.language}"></span>
         </div>
         <div class="video-description" th:text="${video.description}"></div>

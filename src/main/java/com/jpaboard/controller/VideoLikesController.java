@@ -1,11 +1,15 @@
 package com.jpaboard.controller;
 
+import com.jpaboard.entity.Videos;
 import com.jpaboard.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/like")
@@ -18,7 +22,12 @@ public class VideoLikesController {
     @GetMapping("/video/favoriteVideo")
     public String getfavoriteVideoList(Model model) {
 
-        videoService.getVideoLikeList();
+        List<Videos> videos = new ArrayList<>();
+
+        videos = videoService.getVideoLikeList();
+
+        model.addAttribute("videoList", videos);
+
         return "sidePage/videoFavorite"; // 반환할 뷰의 이름
     }
 

@@ -91,21 +91,20 @@ public class VideoService {
 
     public Integer addLike(Long videoId, String userId) {
         // VideoLikes 엔티티 생성
-        VideoLikes like = new VideoLikes();
+        Videos likes = new Videos();
 
-        // 관련된 Videos 엔티티 조회
-        Videos videos = videoRepository.findById(videoId)
-                .orElseThrow(() -> new RuntimeException("Video not found"));
-        like.setVideo(videos);
+        //videoid로 엔티티 조회
+        likes = videoRepository.findById(videoId).orElseThrow(() -> new IllegalArgumentException("Video not found"));
 
-        // 기존 Member 엔티티 조회
-        Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
-        like.setUserid(member);
+        //2.조회수 (viewCount)증가
+        int viewCount = likes.getViewCount() == null ? 0 : likes.getViewCount();
+        likes.setViewCount(viewCount + 1);
 
-        like.setLiked_at(LocalDateTime.now());
-        likeRepository.save(like);
-        return 1;
+        //3.변경 감지(Dirty checking)
+        videoRepository.save(likes);
+
+        //4.갱신된 조회수 반환
+        return likes.getViewCount();
     }
 
     public Integer cancelLike(Long videoId, String userId) {
@@ -124,7 +123,7 @@ public class VideoService {
     }
 
     public ResponseEntity<List<Genres>> genresList() {
-        ResponseEntity<List<Genres>> genres =new ResponseEntity<>(genresRepository.findAll(), HttpStatus.OK);
+        ResponseEntity<List<Genres>> genres = new ResponseEntity<>(genresRepository.findAll(), HttpStatus.OK);
         return genres;
     }
 

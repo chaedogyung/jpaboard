@@ -13,8 +13,7 @@ import com.jpaboard.service.ReplyService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,12 +32,12 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/board/*")
 @RequiredArgsConstructor
 public class BoardController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
     private final BoardService boardService;
     private final ReplyService replyService;
     private final BoardFileService boardFileService;
@@ -46,7 +45,8 @@ public class BoardController {
     //테스트 상세 뷰
     @GetMapping(value = "/testView")
     public String testView() {
-        logger.info("testView");
+        log.info("testView");
+
         return "Ottfragments/left-sidebar";
     }
 
@@ -58,7 +58,7 @@ public class BoardController {
     //게시판 글쓰기 뷰
     @GetMapping(value = "/writeView")
     public String writeView(Model model) {
-        logger.info("writeView");
+        log.info("writeView");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userId = auth.getName();
         model.addAttribute("userId", userId);
@@ -87,7 +87,7 @@ public class BoardController {
     //게시판 수정 뷰
     @GetMapping(value = "/boardUpdateView")
     public String boardUpdateView(Model model, @RequestParam("bno") Long bno) {
-        logger.info("updateView");
+        log.info("updateView");
         BoardVO boardVO = boardService.readWithFiles(bno);
 
         int fileSize = boardVO.getFiles().size();
@@ -110,7 +110,7 @@ public class BoardController {
                               @RequestParam(value = "fileNo", required = false, defaultValue = "") List<String> fileNoList,
                               @RequestParam(value = "delGb", required = false, defaultValue = "") List<String> delGbList,
                               Model model) {
-        logger.info("boardUpdate");
+        log.info("boardUpdate");
 
         if (bindingResult.hasErrors()) {
             return "board/writeView";
@@ -132,7 +132,7 @@ public class BoardController {
                             Model model) {
 
         // 내림차순 정렬을 위한 PageRequest 생성
-        logger.info("boardList - 검색 조건: {}", searchDto);
+        log.info("boardList - 검색 조건: {}", searchDto);
 
         Page<BoardVO> boardList = boardService.boardList(
                 PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "bno")),
@@ -159,7 +159,7 @@ public class BoardController {
     //게시판 조회
     @GetMapping(value = "/readView")
     public String readView(BoardVO boardVO, Model model) {
-        logger.info("read");
+        log.info("read");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         PrincipalDetails principal = (PrincipalDetails) auth.getPrincipal();
@@ -179,12 +179,12 @@ public class BoardController {
     public ResponseEntity<String> replyWrite(@RequestParam Long bno,
                                              @RequestParam String reWriter,
                                              @RequestParam String reContent) throws Exception {
-        logger.info("replyWrite");
+        log.info("replyWrite");
         try {
             replyService.saveReply(bno, reWriter, reContent);
             return ResponseEntity.status(HttpStatus.CREATED).body("Reply created successfully");
         } catch (Exception e) {
-            logger.error("Error while writing reply: ", e);
+            log.error("Error while writing reply: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create reply.");
         }
     }
@@ -211,12 +211,12 @@ public class BoardController {
     //댓글 수정POST
     @PostMapping(value = "/replyUpdate")
     public ResponseEntity<String> replyUpdate(MpReply vo) throws Exception {
-        logger.info("replyUpdate");
+        log.info("replyUpdate");
         try {
             replyService.updateReply(vo);
             return ResponseEntity.status(HttpStatus.CREATED).body("Reply created successfully");
         } catch (Exception e) {
-            logger.error("Error while writing reply: ", e);
+            log.error("Error while writing reply: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create reply.");
         }
     }
@@ -224,12 +224,12 @@ public class BoardController {
     //댓글 삭제
     @DeleteMapping(value = "/replyDelete")
     public ResponseEntity<String> replyDelete(@RequestParam("reRno") Long reRno) throws Exception {
-        logger.info("replyDelete");
+        log.info("replyDelete");
         try {
             replyService.deleteReply(reRno);
             return ResponseEntity.status(HttpStatus.CREATED).body("Reply created successfully");
         } catch (Exception e) {
-            logger.error("Error while writing reply: ", e);
+            log.error("Error while writing reply: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create reply.");
         }
     }
@@ -238,12 +238,12 @@ public class BoardController {
     @PostMapping(value="/replyReplyWrite")
     public ResponseEntity<List<MpReply>> replyReplyWrite(MpReplyDto mpReplyDto){
 
-        logger.info("replyReplyWrite");
+        log.info("replyReplyWrite");
         try{
             ResponseEntity<List<MpReply>> mpReplyList = replyService.replyReplyWrite(mpReplyDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(mpReplyList.getBody());
         } catch(Exception e){
-            logger.error("Error while writing reply: ", e);
+            log.error("Error while writing reply: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 

@@ -60,4 +60,7 @@ class Videos {
     // VideoLikes와의 연관 관계 매핑 (OneToMany)
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VideoLikes> likes; // 좋아요 정보 리스트
+
+    @Column(name="view_count", nullable = true,columnDefinition = "조회수")
+    private Integer viewCount;//조회수
 }
