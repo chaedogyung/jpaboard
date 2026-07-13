@@ -4,6 +4,7 @@ import com.jpaboard.dto.SearchDto;
 import com.jpaboard.dto.VideoDetailDto;
 import com.jpaboard.entity.QVideoLikes;
 import com.jpaboard.entity.QVideos;
+import com.jpaboard.entity.VideoLikes;
 import com.jpaboard.repository.VideoRepositoryCustom;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -80,5 +81,19 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom {
                 .orderBy(video.videoId.desc()) // videoId 기준 내림차순 정렬
                 .fetch();
         return results;
+    }
+
+    @Override
+    public VideoLikes selectFavVideo(Long videoId, String userId){
+        QVideoLikes vL = QVideoLikes.videoLikes;
+
+        return queryFactory
+                .select(Projections.fields(
+                        VideoLikes.class,
+                        vL.like_id
+                ))
+                .from(vL)
+                .where(vL.video.videoId.eq(videoId))
+                .fetchOne();
     }
 }
